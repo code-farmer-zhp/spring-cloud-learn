@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhp.mapper.ScoreMapper">
+
+    <insert id="saveMember">
+          INSERT INTO score_member${table}
+          (mem_guid,total_score,available_score,used_score,expired_score,locked_score,ins_time,up_time)
+          VALUES
+          (#{memGuid},#{score},0,0,0,0,NOW(),NOW())
+    </insert>
+
+    <insert id="saveScoreYear">
+          INSERT INTO score_year_log${table}
+          (sml_seq,scy_seq,mem_guid,score_get,score_consume,ins_time)
+          VALUES
+          (0,0,#{memGuid},#{score},0,NOW())
+    </insert>
+
+    <select id="query" resultType="map">
+      SELECT * FROM score_member${table} WHERE mem_guid=#{memGuid}
+    </select>
+</mapper>
