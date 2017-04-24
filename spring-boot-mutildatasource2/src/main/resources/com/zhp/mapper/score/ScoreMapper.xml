@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhp.mapper.score.ScoreMapper">
+
+    <select id="query" resultType="map">
+        SELECT * FROM score_main_log0  limit 0,10
+    </select>
+
+    <insert id="saveScoreYear">
+        INSERT INTO score_year_log0
+        (sml_seq,scy_seq,mem_guid,score_get,score_consume,ins_time)
+        VALUES
+        (0,0,#{memGuid},#{score},0,NOW())
+    </insert>
+</mapper>

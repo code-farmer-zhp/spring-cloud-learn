@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhp.mapper.consignee.ConsigneeMapper">
+
+    <select id="query" resultType="map">
+        SELECT * FROM UCORD.consignee  where con_guid='AD60CEA6-3E61-1222-8AFC-2F552EBDE69F'
+    </select>
+</mapper>
