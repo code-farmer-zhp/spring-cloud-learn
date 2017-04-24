@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.feiniu.mapper.AddressMapper">
+    <select id="getList" resultMap="address">
+		<![CDATA[
+
+
+					SELECT
+						*
+					FROM
+						(
+							SELECT
+							    A .CON_GUID,
+								A .MEM_GUID,
+								A .CON_PROVINCE,
+								A .CON_PROVINCE_CODE,
+								A .CON_CITY,
+								A .CON_CITY_CODE,
+								A .CON_AREA,
+								A .CON_AREA_CODE,
+								A .CON_TOWN,
+								A .CON_TOWN_CODE,
+								A .CON_ADDR,
+								A .LONGITUDE,
+								A .LATITUDE,
+								ROWNUM AS rn
+							FROM
+								${table} A
+							WHERE
+								A .IS_DELETE = 0
+							AND A .CON_DEFAULT = '1'
+							AND ROWNUM <= #{end}
+						)
+					WHERE
+						rn > #{start}
+
+
+
+        ]]>
+    </select>
+
+    <insert id="saveRelation">
+        INSERT ALL
+        <foreach collection="relations" item="item">
+            INTO ${table}(mem_guid,warehouse_code,ins_time,up_time)
+            VALUES (#{item.memGuid},#{item.warehouseCode},#{item.insTime},#{item.upTime})
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <update id="update">
+        <foreach collection="entities" item="entity" open="begin" close=";end;" separator=";">
+            UPDATE ${table} SET LONGITUDE='${entity.longitude}',LATITUDE='${entity.latitude}'
+            WHERE CON_GUID='${entity.id}'
+        </foreach>
+    </update>
+
+    <update id="updateRelation">
+          UPDATE ${table} SET warehouse_code=#{relation.warehouseCode},up_time=#{relation.upTime}
+          WHERE mem_guid=#{relation.memGuid}
+    </update>
+
+    <resultMap id="address" type="com.feiniu.entity.Address">
+        <id property="id" column="CON_GUID"/>
+        <result property="memGuid" column="MEM_GUID"/>
+        <result property="province" column="CON_PROVINCE"/>
+        <result property="provinceCode" column="CON_PROVINCE_CODE"/>
+        <result property="city" column="CON_CITY"/>
+        <result property="cityCode" column="CON_CITY_CODE"/>
+        <result property="area" column="CON_AREA"/>
+        <result property="areaCode" column="CON_AREA_CODE"/>
+        <result property="town" column="CON_TOWN"/>
+        <result property="areaCode" column="CON_TOWN_CODE"/>
+        <result property="address" column="CON_ADDR"/>
+        <result property="longitude" column="LONGITUDE"/>
+        <result property="latitude" column="LATITUDE"/>
+    </resultMap>
+</mapper>
