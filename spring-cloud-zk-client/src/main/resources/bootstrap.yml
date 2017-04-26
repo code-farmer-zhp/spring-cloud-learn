@@ -1,0 +1,11 @@
+#zkCli.sh
+#create /config ""
+#create /config/spring-zk-client ""
+#create /config/spring-zk-client/msg helloworld
+spring:
+  application:
+    name: spring-zk-client
+  cloud:
+    zookeeper:
+        enabled: true
+        connectString: 10.202.249.181:2181
