@@ -34,8 +34,6 @@ public class DynamicAsyncContext implements InitializingBean {
 
     private ThreadPoolExecutor executor;
 
-    private BlockingQueue<Runnable> blockingQueue;
-
     private AsyncListener asyncListener;
 
     public void afterPropertiesSet() throws Exception {
@@ -43,7 +41,7 @@ public class DynamicAsyncContext implements InitializingBean {
         int corePoolSize = Integer.valueOf(split[0]);
         int maxNumPoolSize = Integer.valueOf(split[1]);
 
-        blockingQueue = new LinkedBlockingDeque<>(queueCapacity);
+        BlockingQueue<Runnable> blockingQueue = new LinkedBlockingDeque<>(queueCapacity);
 
         executor = new ThreadPoolExecutor(corePoolSize, maxNumPoolSize,
                 keepAliveTimeInSeconds, TimeUnit.SECONDS, blockingQueue);
