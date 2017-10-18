@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'
+					 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 xsi:schemaLocation="http://jakarta.apache.org/log4j/ ">
+
+	<!-- appender name="STDOUT" class="org.apache.log4j.ConsoleAppender"> <layout 
+		class="org.apache.log4j.PatternLayout"> <param name="ConversionPattern" value="%-5p 
+		%d{MM月dd号 HH:mm} %-36c %5L %m%n" /> </layout> </appender -->
+
+	<!-- 把DEBUG信息输出到控制台 -->
+	<appender name="DEBUGConsole" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c   %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="DEBUG"/>
+		</filter>
+	</appender>
+	<appender name="INFOConsole" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c   %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO"/>
+		</filter>
+	</appender>
+
+	<root>
+		<priority value="debug" />
+		<appender-ref ref="DEBUGConsole" />
+	</root>
+</log4j:configuration>

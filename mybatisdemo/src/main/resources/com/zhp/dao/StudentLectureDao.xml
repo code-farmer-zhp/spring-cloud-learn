@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhp.dao.StudentLectureDao">
+
+    <resultMap id="studentLecture" type="studentLecture">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="grade" column="grade"/>
+        <result property="note" column="note"/>
+        <association property="lecture" column="lecture_id" select="com.zhp.dao.LectureDao.findById"/>
+    </resultMap>
+
+    <select id="getByStudentId" resultMap="studentLecture">
+        SELECT id,student_id,lecture_id,grade,note FROM t_student_lecture
+        WHERE student_id=#{studentId}
+    </select>
+
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhp.dao.StudentDao">
+
+    <!--<cache flushInterval="1000" readOnly="true" eviction="LRU" size="1024"/>-->
+    <resultMap id="student" type="student">
+        <id property="id" column="id"/>
+        <result property="cnname" column="cnname"/>
+        <result property="sex" column="sex"/>
+        <result property="note" column="note"/>
+        <!--一对一关联查询 -->
+        <association property="studentSelfcard" column="id" select="com.zhp.dao.StudentSelfcardDao.findByStudentId"/>
+
+        <!--一对多关联查询 -->
+        <collection property="studentLectureList" column="id" select="com.zhp.dao.StudentLectureDao.getByStudentId"/>
+
+        <discriminator javaType="int" column="sex">
+            <case value="1" resultMap="maleStudent"/>
+            <case value="2" resultMap="femaleStudent"/>
+        </discriminator>
+    </resultMap>
+
+    <resultMap id="maleStudent" type="maleStudent" extends="student">
+        <collection property="studentHealthMaleList" column="id"
+                    select="com.zhp.dao.StudentHealthMaleDao.getByStudentId"/>
+    </resultMap>
+
+    <resultMap id="femaleStudent" type="femaleStudent" extends="student">
+        <collection property="studentHealthFemaleList" column="id"
+                    select="com.zhp.dao.StudentHealthFemaleDao.getByStudentId"/>
+    </resultMap>
+
+    <update id="updateName">
+        UPDATE t_student set cnname=#{name}
+    </update>
+
+    <select id="getStudnetById" resultMap="student">
+      SELECT id,cnname,sex,note FROM t_student WHERE id=#{id}
+    </select>
+
+    <select id="findAllStudent" resultMap="student2" >
+        SELECT s.id,s.cnname,s.sex,s.note AS snote,
+            IF(sex=1,shm.id,shf.id) AS hid,
+            IF(sex=1,shm.check_datae,shf.check_datae) AS check_date,
+            IF(sex=1,shm.heart,shf.heart) AS heart,
+            IF(sex=1,shm.liver,shf.liver) AS liver,
+            IF(sex=1,shm.spleen,shf.spleen) AS spleen,
+            IF(sex=1,shm.lung,shf.lung) AS lung,
+            IF(sex=1,shm.kidney,shf.kidney) AS kidney,
+            IF(sex=1,shm.note,shf.note) AS shnote,
+            shm.prostate,shf.uterus,
+            ss.id AS ssid, ss.native AS native,
+            ss.issue_date,ss.end_date,ss.note AS ssnote,
+            sl.id AS slid,
+            sl.lecture_id,sl.grade,sl.note AS slnote,
+            l.lecture_name,l.note AS lnote
+            FROM t_student s
+            LEFT JOIN t_student_health_male shm ON s.id=shm.student_id
+            LEFT JOIN t_student_health_female shf ON s.id=shf.student_id
+            LEFT JOIN t_student_selfcard ss ON s.id=ss.student_id
+            LEFT JOIN t_student_lecture sl ON s.id =sl.student_id
+            LEFT JOIN t_lecture l ON l.id=sl.lecture_id
+    </select>
+    
+    <select id="findByName" resultType="com.zhp.entity.Student">
+        <bind name="pattern" value="'%'+name+'%'"/>
+        SELECT id,cnname,sex,note FROM t_student WHERE cnname like #{pattern}
+    </select>
+
+
+    <resultMap id="student2" type="student">
+        <id property="id" column="id"/>
+        <result property="cnname" column="cnname"/>
+        <result property="sex" column="sex"/>
+        <result property="note" column="snote"/>
+        <association property="studentSelfcard" column="id" javaType="studentSelfcard">
+            <id property="id" column="ssid"/>
+            <result property="studentId" column="id"/>
+            <result property="anative" column="native"/>
+            <result property="issueDate" column="issue_date"/>
+            <result property="endDate" column="end_date"/>
+            <result property="note" column="ssnote"/>
+        </association>
+
+        <collection property="studentLectureList" column="id" ofType="studentLecture">
+            <id property="id" column="slid"/>
+            <result property="studentId" column="id"/>
+            <result property="grade" column="grade"/>
+            <result property="note" column="slnote"/>
+            <association property="lecture" column="lecture_id" javaType="lecture">
+                <id property="id" column="lecture_id"/>
+                <result property="lectureName" column="lecture_name"/>
+                <result property="note" column="lnote"/>
+            </association>
+        </collection>
+
+        <discriminator javaType="int" column="sex">
+            <case value="1" resultMap="maleStudent2"/>
+            <case value="2" resultMap="femaleStudent2"/>
+        </discriminator>
+    </resultMap>
+
+
+    <resultMap id="maleStudent2" type="maleStudent" extends="student2">
+        <collection property="studentHealthMaleList" column="id" ofType="StudentHealthMale">
+            <id property="id" column="hid"/>
+            <result property="studentId" column="id"/>
+            <result property="checkDate" column="check_date"/>
+            <result property="heart" column="heart"/>
+            <result property="liver" column="liver"/>
+            <result property="spleen" column="spleen"/>
+            <result property="lung" column="lung"/>
+            <result property="kidney" column="kidney"/>
+            <result property="prostate" column="prostate"/>
+            <result property="note" column="note"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="femaleStudent2" type="femaleStudent" extends="student2">
+        <collection property="studentHealthFemaleList" column="id" ofType="StudentHealthFemale">
+            <id property="id" column="hid"/>
+            <result property="studentId" column="id"/>
+            <result property="checkDate" column="check_date"/>
+            <result property="heart" column="heart"/>
+            <result property="liver" column="liver"/>
+            <result property="spleen" column="spleen"/>
+            <result property="lung" column="lung"/>
+            <result property="kidney" column="kidney"/>
+            <result property="uterus" column="uterus"/>
+            <result property="note" column="note"/>
+        </collection>
+    </resultMap>
+
+</mapper>

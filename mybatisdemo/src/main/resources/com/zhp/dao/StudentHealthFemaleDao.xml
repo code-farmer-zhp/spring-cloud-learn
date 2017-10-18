@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhp.dao.StudentHealthFemaleDao">
+
+    <resultMap id="studentHealthFemale" type="studentHealthFemale">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="checkDate" column="check_datae"/>
+        <result property="heart" column="heart"/>
+        <result property="liver" column="liver"/>
+        <result property="spleen" column="spleen"/>
+        <result property="lung" column="lung"/>
+        <result property="kidney" column="kidney"/>
+        <result property="uterus" column="uterus"/>
+        <result property="note" column="note"/>
+    </resultMap>
+
+    <select id="getByStudentId" resultMap="studentHealthFemale">
+        SELECT id,student_id,check_datae,heart,liver,spleen,lung,kidney,uterus,note FROM t_student_health_female
+        WHERE student_id=#{studentId}
+    </select>
+
+</mapper>
