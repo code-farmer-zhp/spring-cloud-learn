@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.feiniu.score.mapper.score.ScoreMainLogMapper">
+
+    <select id="getScoreMainLog" resultMap="scoreMainLog">
+		SELECT  *
+		FROM score_main_log${tableNo}
+		WHERE og_seq = #{ogSeq} AND mem_guid = #{memGuid} AND channel = #{channel}
+	</select>
+
+    <select id="getScoreMainLogForUpdate" resultMap="scoreMainLog">
+		SELECT  *
+		FROM score_main_log${tableNo}
+		WHERE og_seq = #{ogSeq} AND mem_guid = #{memGuid} AND channel = #{channel}
+		FOR UPDATE
+
+	</select>
+
+    <select id="getScoreMainLogByUniqueIdForUpdate" resultMap="scoreMainLog">
+        SELECT  *
+		FROM score_main_log${tableNo}
+		WHERE unique_id =#{uniqueId}
+		FOR UPDATE
+    </select>
+
+    <select id="findScoreMainLog" resultMap="scoreMainLog">
+		SELECT  *
+		FROM score_main_log${tableNo}
+		where og_seq = #{ogSeq} AND mem_guid = #{memGuid} AND channel = #{channel} and rg_seq=#{rgSeq}
+	</select>
+
+    <select id="getScoreMainLogById" resultMap="scoreMainLog">
+		SELECT  *
+		FROM score_main_log${tableNo}
+		WHERE sml_seq = #{smlSeq} 
+	</select>
+
+    <select id="getScoreMainLogCountByChannel" resultType="Integer">
+		SELECT  count(1)
+		FROM score_main_log${tableNo}
+		WHERE mem_guid = #{memGuid} AND channel = #{channel}
+	</select>
+
+    <select id="getTodayScoreBySign" resultType="Integer">
+		SELECT  score_number
+		FROM score_main_log${tableNo}
+        WHERE unique_id =#{uniqueId}
+	</select>
+
+
+    <select id="getScoreMainLogBack" resultMap="scoreMainLog">
+		SELECT  *
+		FROM score_main_log${tableNo}
+		WHERE rg_seq = #{rgSeq} AND mem_guid = #{memGuid} AND channel = #{channel}
+	</select>
+
+    <update id="updateScoreMainLog">
+        UPDATE score_main_log${tableNo}
+        SET remark=#{sml.remark},`status`=#{sml.status} ,
+        score_number = #{sml.scoreNumber},og_seq =#{sml.ogSeq},channel = #{sml.channel},rg_seq=#{sml.rgSeq},comment_seq
+        = #{sml.commentSeq},
+        lock_job_status=#{sml.lockJobStatus},up_time=now(),
+        <choose>
+            <when test="sml.endTime == null">
+                end_time ='0000-00-00',
+            </when>
+            <otherwise>
+                end_time =#{sml.endTime},
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="sml.actualTime == null">
+                actual_time ='0000-00-00',
+            </when>
+            <otherwise>
+                actual_time =#{sml.actualTime},
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="sml.limitTime == null">
+                limit_time ='0000-00-00'
+            </when>
+            <otherwise>
+                limit_time=#{sml.limitTime}
+            </otherwise>
+        </choose>
+        WHERE sml_seq = #{sml.smlSeq}
+    </update>
+
+    <update id="updateScoreMainLogJobStatus">
+        UPDATE score_main_log${tableNo}
+        SET up_time=now(),
+        <!-- 有效积分job执行状态 -->
+        lock_job_status=#{status}
+        WHERE sml_seq = #{smlSeq}
+    </update>
+
+    <insert id="saveScoreMainLog" useGeneratedKeys="true" keyProperty="sl.smlSeq">
+        INSERT INTO score_main_log${tableNo}
+        (mem_guid, score_number, ins_time, end_time, limit_time, status, og_seq,og_no, channel,
+        rg_seq,comment_seq,remark, lock_job_status,rg_no, actual_time,province_id,unique_id,up_time)
+        VALUES
+        (#{sl.memGuid}, #{sl.scoreNumber},
+        <choose>
+            <when test="sl.insTime == null">now()</when>
+            <otherwise>#{sl.insTime}</otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="sl.endTime == null">'0000-00-00'</when>
+            <otherwise>#{sl.endTime}</otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="sl.limitTime == null">'0000-00-00'</when>
+            <otherwise>#{sl.limitTime}</otherwise>
+        </choose>
+        , #{sl.status}, #{sl.ogSeq},
+        <choose>
+            <when test="sl.ogNo == null">''</when>
+            <otherwise>#{sl.ogNo}</otherwise>
+        </choose>
+        ,#{sl.channel}, #{sl.rgSeq},#{sl.commentSeq}, #{sl.remark},
+        <choose>
+            <when test="sl.lockJobStatus == null">0</when>
+            <otherwise>#{sl.lockJobStatus}</otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="sl.rgNo == null">''</when>
+            <otherwise>#{sl.rgNo}</otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="sl.actualTime == null">'0000-00-00'</when>
+            <otherwise>#{sl.actualTime}</otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="sl.provinceId == null">''</when>
+            <otherwise>#{sl.provinceId}</otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="sl.channel == 0 or sl.channel == 2 or sl.channel == 5">
+                concat(#{sl.ogSeq},'_',#{sl.channel})
+            </when>
+            <when test="sl.channel == 1 or sl.channel == 3">
+                <choose>
+                    <when test="sl.generalId !=null and sl.generalId !=''">
+                        concat(#{sl.rgSeq},'_',#{sl.generalId},#{sl.channel})
+                    </when>
+                    <otherwise>
+                        concat(#{sl.rgSeq},'_',#{sl.channel})
+                    </otherwise>
+                </choose>
+            </when>
+            <when test="sl.channel == 6 or sl.channel == 7">
+                <choose>
+                    <when test="sl.generalId !=null and sl.generalId !=''">
+                        concat(#{sl.ogSeq},'_',#{sl.generalId},'_',#{sl.channel})
+                    </when>
+                    <otherwise>
+                        concat(#{sl.ogSeq},'_',#{sl.channel})
+                    </otherwise>
+                </choose>
+
+            </when>
+            <when test="sl.channel == 8 or sl.channel == 9 or sl.channel == 28">
+                concat(#{sl.memGuid},'_',#{sl.channel})
+            </when>
+            <when test="sl.channel == 10 or sl.channel== 11 or sl.channel == 12">
+                concat(#{sl.commentSeq},'_',#{sl.channel})
+            </when>
+            <when test="sl.channel == 13 or sl.channel== 14 or sl.channel == 15">
+                concat(#{sl.commentSeq},'_',#{sl.channel})
+            </when>
+            <when test="sl.channel == 16">
+                concat(#{sl.memGuid},'_',DATE_FORMAT(NOW(),'%Y%m%d'),'_',#{sl.channel})
+            </when>
+            <when test="sl.channel == 17">
+                concat(#{sl.memGuid},'_',#{sl.ogSeq},'_',UNIX_TIMESTAMP(NOW()),'_',#{sl.channel})
+            </when>
+            <when test="sl.channel ==18 or sl.channel == 19 or sl.channel == 20">
+                concat(#{sl.commentSeq},'_',#{sl.channel})
+            </when>
+            <when test="sl.channel ==21 or sl.channel == 22">
+                concat(#{sl.memGuid},'_',#{sl.generalId},'_',#{sl.channel})
+            </when>
+            <when test="sl.channel ==23 or sl.channel == 24">
+                concat(#{sl.memGuid},'_',UNIX_TIMESTAMP(NOW()),'_',#{sl.channel})
+            </when>
+            <when test="sl.channel ==25 or sl.channel == 29">
+                concat(#{sl.ogSeq},'_',#{sl.channel})
+            </when>
+            <when test="sl.channel ==26">
+                concat(#{sl.memGuid},'_',#{sl.remark},'_',#{sl.channel})
+            </when>
+            <when test="sl.channel == 27 and (sl.uniqueId == null or sl.uniqueId=='')">
+                concat(#{sl.memGuid},'_',UNIX_TIMESTAMP(NOW()),'_',#{sl.channel})
+            </when>
+            <otherwise>
+                #{sl.uniqueId}
+            </otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="sl.upTime == null">now()</when>
+            <otherwise>#{sl.upTime}</otherwise>
+        </choose>
+        )
+    </insert>
+
+
+    <sql id="commonSql">
+
+        FROM score_main_log${tableNo} where mem_guid=#{mapParam.memGuid}
+        and status = 1 and channel not in(5,18,19,20) <!-- 所有查询排除已生效信息。防止出现重复记录 -->
+        and score_number != 0 <!-- 过滤掉消费积分或得到积分为0的 -->
+        <if test="mapParam.ogSeq != null">
+            and og_seq=#{mapParam.ogSeq}
+        </if>
+        <if test="mapParam.ogNo != null">
+            and og_no=#{mapParam.ogNo}
+        </if>
+        <choose>
+            <when test="mapParam.srcType == 1">
+                <!--购物 （订单下单，订单退货，订单完成，订单取消,兑换商品  -->
+                and channel in (0,1,2,3,5,6,7,25,29)
+            </when>
+            <when test="mapParam.srcType == 2">
+                <!-- 评论 -->
+                and channel in (10,11,12,13,14,15)
+            </when>
+            <when test="mapParam.srcType == 3">
+                <!-- 绑定手机 -->
+                and channel in (8)
+            </when>
+            <when test="mapParam.srcType == 4">
+                <!-- 绑定邮箱 -->
+                and channel in (9)
+            </when>
+            <when test="mapParam.srcType == 5">
+                <!-- 签到 -->
+                and channel in (16)
+            </when>
+            <when test="mapParam.srcType == 6">
+                <!-- 抽奖 -->
+                and channel in (23,24)
+            </when>
+            <when test="mapParam.srcType == 7">
+                <!-- 兑换券 -->
+                and channel in (26,27)
+            </when>
+            <when test="mapParam.srcType == 8">
+                <!-- 飞牛赠送-->
+                and channel in (21,22)
+            </when>
+            <when test="mapParam.srcType == 9">
+                <!-- 完善兴趣爱好 app升级送积分-->
+                and channel in (28,30)
+            </when>
+        </choose>
+
+        <choose>
+            <when test="mapParam.directType == 1">
+                <!--积分累积  显示所有导致客人可用积分、待生效积分增加的记录    （排除已生效记录）-->
+                and channel in (0,3,6,8,9,10,11,12,16,17,21,23,28,30)
+            </when>
+            <when test="mapParam.directType == 2">
+                <!-- 积分消费  显示所有客人使用的积分的记录，不包含客人退货，系统扣取积分的记录 -->
+                and channel in (2,24,25,26,27,29)
+            </when>
+        </choose>
+
+        <if test="mapParam.startTime != null">
+            and ins_time >=#{mapParam.startTime}
+        </if>
+
+        <if test="mapParam.endTime != null">
+            and ins_time &lt;=#{mapParam.endTime}
+        </if>
+
+    </sql>
+
+
+    <select id="getUserScoreDetailList" resultType="map">
+        SELECT
+        rg_seq "rgSeq",
+        og_seq "ogSeq",
+        og_no "ogNo",
+        comment_seq "commentSeq",
+        score_number "scoreNumber",
+        channel "channel",
+        DATE_FORMAT(up_time, '%Y/%m/%d') "insTime",
+        limit_time "limitTime",
+        up_time "insDate",
+        lock_job_status "lockJobStatus",
+        remark "remark"
+        <include refid="commonSql"/>
+        ORDER BY insDate DESC
+        limit #{mapParam.start},#{mapParam.pageSize}
+    </select>
+
+    <select id="getUserScoreDetailListCount" resultType="Integer">
+        SELECT COUNT(1)
+        <include refid="commonSql"/>
+    </select>
+
+    <select id="getScoreMainLogList" resultMap="scoreMainLog">
+        SELECT *
+        from score_main_log${tableNo}
+        where 1=1
+
+        <if test="mapParam.limitTime != null">
+            and status = 1
+            <!--  订单购买  论获得积分  评论设定精华获得积分  评论置顶获得积分   -->
+            and channel in(0, 21)
+            and limit_time &lt;=#{mapParam.limitTime}
+            <!--  有效积分job执行状态 0默认状态 1成功  -->
+            and lock_job_status = 0
+        </if>
+
+        <if test="mapParam.scoreLimitTime != null">
+            and limit_time =#{mapParam.scoreLimitTime}
+        </if>
+
+        <if test="mapParam.upTime != null">
+            AND up_time &lt;date_format(date_add(#{mapParam.upTime}, interval 1 day),'%Y-%m-%d')
+            AND up_time >=date_format(#{mapParam.upTime},'%Y-%m-%d')
+        </if>
+
+        <if test="mapParam.mallDataSyncChannel != null">
+            <!--  -->
+            and channel in(0, 1, 2, 3, 6, 7)
+        </if>
+
+
+        <if test="mapParam.channels != null">
+            and channel in(${mapParam.channels})
+        </if>
+
+        <if test="mapParam.status != null">
+            and status =#{mapParam.status}
+        </if>
+
+        <if test="mapParam.channel != null">
+            and channel =#{mapParam.channel}
+        </if>
+
+        <if test="mapParam.ogSeq != null">
+            and og_seq =#{mapParam.ogSeq}
+        </if>
+
+        <if test="mapParam.memGuid != null">
+            AND mem_guid =#{mapParam.memGuid}
+        </if>
+
+        limit #{mapParam.start},#{mapParam.pageSize}
+    </select>
+
+    <select id="getScoreMainLogListBySmlSeq" resultMap="scoreMainLog">
+        SELECT *
+        from score_main_log${tableNo}
+        where 1=1 and status = 1
+        AND rg_seq != ''
+        AND rg_no =''
+
+        <if test="mapParam.beginSmlSeq != null">
+            and sml_seq >=#{mapParam.beginSmlSeq}
+        </if>
+
+        <if test="mapParam.endSmlSeq != null">
+            and sml_seq &lt;#{mapParam.endSmlSeq}
+        </if>
+
+        <if test="mapParam.channel != null">
+            and channel =#{mapParam.channel}
+        </if>
+
+        limit #{mapParam.start},#{mapParam.pageSize}
+    </select>
+
+    <update id="updateRgNo">
+		update score_main_log${tableNo}  set rg_no = #{rgNo}
+		where sml_seq = #{smlSeq}
+	</update>
+
+
+    <delete id="deleteScoreMainLogById">
+		DELETE from score_main_log${tableNo}
+		WHERE sml_seq = #{smlSeq}
+	
+	</delete>
+
+
+    <sql id="erpCommentQuerySql">
+        FROM score_main_log${tableNo}
+        <!-- 排除积分变可用类型 -->
+        WHERE status = 1 AND score_number != 0 AND channel not in(5,18,19,20) AND mem_guid = #{memGuid}
+        <if test="paramMap.ogNo != null">
+            AND og_no=#{paramMap.ogNo}
+        </if>
+        <if test="paramMap.startTime != null">
+            AND ins_time >=#{paramMap.startTime}
+        </if>
+
+        <if test="paramMap.endTime != null">
+            AND ins_time &lt;=#{paramMap.endTime}
+        </if>
+
+    </sql>
+
+    <select id="getUserScoreLogDetailList" resultType="map">
+        SELECT
+        og_no "ogNo",
+        og_seq "ogSeq",
+        score_number "scoreNumber",
+        comment_seq "commentSeq",
+        rg_no "rgSeq",
+        channel "channel",
+        DATE_FORMAT(ins_time, '%Y/%m/%d %T') "date",
+        limit_time "limitTime",
+        end_time "endTime",
+        remark "remark",
+        lock_job_status "lockJobStatus",
+        ins_time "insTime"
+        <include refid="erpCommentQuerySql"/>
+        ORDER BY insTime DESC
+        LIMIT #{paramMap.start},#{paramMap.pageSize}
+    </select>
+
+    <select id="getUserScoreLogDetailListCount" resultType="Integer">
+        SELECT COUNT(1)
+        <include refid="erpCommentQuerySql"/>
+    </select>
+
+    <!--  获取订单生效积分   -->
+    <select id="getOrderAvailableScore" resultType="Integer">
+        SELECT sum(score_number) FROM score_main_log${tableNo}
+        WHERE status = 1
+        and mem_guid = #{memGuid}
+        and og_seq = #{ogSeq}
+        <!--  订单购买（增加积分）, 退货发放收回（回收积分） -->
+        and channel in(0, 1)
+    </select>
+
+    <!--  待生效积分        ps:生效前失效(生效前退货扣回赠送积分等)的积分本表不做记录；  -->
+    <select id="getLockedScore" resultType="Integer">
+        SELECT sum(score_number) FROM score_main_log${tableNo}
+        WHERE status = 1
+
+        <!-- 实际支付时间     -->
+        AND actual_time &lt;date_format(date_add(#{paramMap.actualTime}, interval 1 day),'%Y-%m-%d')
+        AND actual_time >=date_format(#{paramMap.actualTime},'%Y-%m-%d')
+        <!--  0：订单购买（增加积分）；21: CRM赠送可用积分 -->
+        AND channel in(0, 21)
+        AND lock_job_status != 1
+    </select>
+
+
+    <!-- 未生效余额 -->
+    <select id="getLeftToBeEffective" resultType="Integer">
+        SELECT sum(score_number) FROM score_main_log${tableNo}
+        WHERE status = 1
+
+        <!-- 实际支付时间     -->
+        AND actual_time &lt;date_format(date_add(#{paramMap.actualTime}, interval 1 day),'%Y-%m-%d')
+        AND actual_time >date_format(date_add(#{paramMap.actualTime}, interval -9 day),'%Y-%m-%d')
+        <!--  0：订单购买（增加积分）；1:退货发放收回（回收积分）; 21: CRM赠送可用积分 -->
+        AND channel in(0, 1, 21)
+    </select>
+
+    <!--  获取当日生效积分   -->
+    <select id="getEffectedScore" resultType="Integer">
+        SELECT sum(score_number) FROM score_main_log${tableNo}
+        WHERE status = 1
+        <!-- 查询插入日期为某天的记录 -->
+        AND ins_time &lt;date_format(date_add(#{paramMap.insTime}, interval 1 day),'%Y-%m-%d')
+        AND ins_time >=date_format(#{paramMap.insTime},'%Y-%m-%d')
+        <!--  8:绑定手机获得积分;9:绑定邮箱获得积分; 10:评论获得积分; 11:评论设定精华获得积分; 12：评论置顶获得积分; 16：用户签到获得积分; 17:审核通过送积分  -->
+        and (channel in(8, 9, 10, 11, 12, 16 ,17) or (channel = 21 and lock_job_status = 1))
+    </select>
+
+    <!--  获取当日失效积分   -->
+    <select id="getFailureScore" resultType="Integer">
+        SELECT -sum(score_number) FROM score_main_log${tableNo}
+        WHERE status = 1
+        <!-- 实际支付时间     -->
+        AND actual_time &lt;date_format(date_add(#{paramMap.actualTime}, interval 1 day),'%Y-%m-%d')
+        AND actual_time >=date_format(#{paramMap.actualTime},'%Y-%m-%d')
+        AND limit_time = '0000-00-00'
+        <!--  1：退货发放收回（回收积分）；7:订单取消发放收回（回收积分）; 13：客人退货回收评论积分; 14:客人退货回收评论设置精华积分; 15：客人退货回收评论置顶积分  ; 22: CRM回收 -->
+        AND channel in (1, 7, 13, 14, 15, 22)
+    </select>
+
+    <!--  获取当日使用积分   -->
+    <select id="getUsedScore" resultType="Integer">
+        SELECT -sum(score_number) FROM score_main_log${tableNo}
+        WHERE status = 1
+
+        <!-- 查询插入日期为某天的记录 -->
+        AND ins_time &lt;date_format(date_add(#{paramMap.insTime}, interval 1 day),'%Y-%m-%d')
+        AND ins_time >=date_format(#{paramMap.insTime},'%Y-%m-%d')
+        <!--  订单消费（抵扣积分）   -->
+        and channel = 2
+    </select>
+
+    <!--  获取当日退订返点积分   -->
+    <select id="getReciperareScore" resultType="Integer">
+        SELECT sum(score_number) FROM score_main_log${tableNo}
+        WHERE status = 1
+
+        <!-- 查询插入日期为某天的记录 -->
+        AND ins_time &lt;date_format(date_add(#{paramMap.insTime}, interval 1 day),'%Y-%m-%d')
+        AND ins_time >=date_format(#{paramMap.insTime},'%Y-%m-%d')
+        <!-- 3：退货时消费退回（抵扣积分退回）; 6:订单取消消费退回（抵扣积分退回）; -->
+        AND channel IN(3, 6)
+    </select>
+
+
+    <select id="getAvailbaleScoreMainLogAboutOrder" resultMap="scoreMainLog">
+		SELECT  *
+		FROM score_main_log${tableNo}
+		WHERE  mem_guid = #{memGuid} AND channel = #{channel} and og_seq=#{ogSeq}
+	</select>
+
+    <select id="getLastEffectiveOrderTime" resultType="Date">
+	    SELECT MAX(actual_time) FROM score_main_log${tableNo}
+	    WHERE mem_guid = #{memGuid}
+	    AND channel=0 AND status=1 AND og_seq is not null AND og_seq!=''
+	</select>
+
+
+    <select id="getSignCountAfterLastEffectiveOrder" resultType="Integer">
+        SELECT COUNT(1) FROM score_main_log${tableNo} s1
+        WHERE mem_guid = #{memGuid}
+        AND channel=16 AND status=1
+        <if test="LastEffectiveOrderTime != null">
+            AND actual_time>#{LastEffectiveOrderTime}
+        </if>
+        AND actual_time>#{onlineTime}
+    </select>
+
+    <select id="getScoreMainLogByUniqueId" resultMap="scoreMainLog">
+		SELECT  sml_seq,score_number,province_id,channel
+		FROM score_main_log${tableNo}
+		WHERE unique_id = #{uniqueId} 
+	</select>
+
+    <select id="getScoreMainLogMemGuidList" resultType="String">
+        SELECT DISTINCT(mem_guid)
+        from score_main_log${tableNo}
+        where 1=1
+
+        <if test="mapParam.limitTime != null">
+            and status = 1
+            <!--  订单购买  论获得积分  评论设定精华获得积分  评论置顶获得积分   -->
+            and channel in(0, 21)
+            and limit_time &lt;=#{mapParam.limitTime}
+            <!--  有效积分job执行状态 0默认状态 1成功  -->
+            and lock_job_status = 0
+        </if>
+
+        <if test="mapParam.scoreLimitTime != null">
+            and limit_time =#{mapParam.scoreLimitTime}
+        </if>
+
+        <if test="mapParam.upTime != null">
+            AND up_time &lt;date_format(date_add(#{mapParam.upTime}, interval 1 day),'%Y-%m-%d')
+            AND up_time >=date_format(#{mapParam.upTime},'%Y-%m-%d')
+        </if>
+
+        <if test="mapParam.mallDataSyncChannel != null">
+            <!--  -->
+            and channel in(0, 1, 2, 3, 6, 7)
+        </if>
+
+
+        <if test="mapParam.channels != null">
+            and channel in(${mapParam.channels})
+        </if>
+
+        <if test="mapParam.status != null">
+            and status =#{mapParam.status}
+        </if>
+
+        <if test="mapParam.channel != null">
+            and channel =#{mapParam.channel}
+        </if>
+
+        <if test="mapParam.ogSeq != null">
+            and og_seq =#{mapParam.ogSeq}
+        </if>
+        <if test="mapParam.start!= null and mapParam.pageSize!=null">
+            limit #{mapParam.start},#{mapParam.pageSize}
+        </if>
+    </select>
+
+    <select id="getMemUnlockedScoreByUpTime" resultType="map">
+       SELECT mem_guid,(SELECT available_score FROM score_member${tableNo} sm WHERE sm.mem_guid=sml.mem_guid) 
+       AS mem_score,SUM(score_number) AS changed_score
+	   FROM score_main_log${tableNo} sml 
+	   WHERE  mem_guid = #{memGuid}
+	   AND channel=5
+	   AND up_time &lt;date_format(date_add(#{upTime}, interval 1 day),'%Y-%m-%d')
+       AND up_time >=date_format(#{upTime},'%Y-%m-%d')
+    </select>
+
+    <select id="getUnlockedScoreInfoList" resultType="map">
+        SELECT mem_guid,(SELECT available_score FROM score_member${tableNo} sm WHERE sm.mem_guid=sml.mem_guid)
+        AS mem_score,SUM(score_number) AS changed_score,date_format(up_time,'%Y-%m-%d') as up_time
+        FROM score_main_log${tableNo} sml
+        WHERE channel=5
+        <if test="mapParam.upTime != null">
+            AND up_time &lt;date_format(date_add(#{mapParam.upTime}, interval 1 day),'%Y-%m-%d')
+            AND up_time >=date_format(#{mapParam.upTime},'%Y-%m-%d')
+        </if>
+        GROUP BY mem_guid
+        <if test="mapParam.start!= null and mapParam.pageSize!=null">
+            limit #{mapParam.start},#{mapParam.pageSize}
+        </if>
+    </select>
+
+    <resultMap type="com.feiniu.score.entity.score.ScoreMainLog" id="scoreMainLog">
+        <id property="smlSeq" column="sml_seq"/>
+        <result property="memGuid" column="mem_guid"/>
+        <result property="scoreNumber" column="score_number"/>
+        <result property="insTime" column="ins_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="limitTime" column="limit_time"/>
+        <result property="status" column="status"/>
+        <result property="ogSeq" column="og_seq"/>
+        <result property="ogNo" column="og_no"/>
+        <result property="channel" column="channel"/>
+        <result property="rgSeq" column="rg_seq"/>
+        <result property="commentSeq" column="comment_seq"/>
+        <result property="remark" column="remark"/>
+        <result property="upTime" column="up_time"/>
+        <result property="lockJobStatus" column="lock_job_status"/>
+        <result property="uniqueId" column="unique_id"/>
+        <result property="provinceId" column="province_id"/>
+    </resultMap>
+
+
+    <select id="getLastSignInfo" resultMap="SignInfo">
+        select DATE_FORMAT(min(ins_time),'%Y-%m-%d') as dur_begin_date, DATE_FORMAT(max(ins_time),'%Y-%m-%d') as
+        dur_end_date,(max(id1)-min(id1)+1) as endurance_days
+        from
+        (
+        <![CDATA[
+        select datediff(ins_time,curdate()) as id1,
+        (select count(1) from score_main_log${tableNo} force index(mem_guid,ins_time) where ins_time <= a.ins_time  and mem_guid = #{memGuid} and channel=#{paramMap.channel}) id2 ,
+        ins_time from score_main_log${tableNo} as a
+        where mem_guid = #{memGuid} and channel=#{paramMap.channel}
+         ]]>
+        <if test="paramMap.startDate!= null and paramMap.endDate!=null">
+            <![CDATA[
+                and ins_time >=Date(#{paramMap.startDate})  AND ins_time <Date(#{paramMap.endDate})
+            ]]>
+        </if>
+        ) as b
+        group by b.id1-b.id2
+        order by dur_end_date desc
+        limit 1
+    </select>
+
+    <resultMap type="com.feiniu.score.vo.SignInfo" id="SignInfo">
+        <result property="durBeginDate" column="dur_begin_date"/>
+        <result property="durEndDate" column="dur_end_date"/>
+        <result property="enduranceDays" column="endurance_days"/>
+    </resultMap>
+
+
+    <select id="getSignDateThisMonth" resultType="String">
+        SELECT  DATE_FORMAT(ins_time,"%d")
+        FROM score_main_log${tableNo}
+        WHERE mem_guid = #{memGuid} AND channel = #{channel} and DATE_FORMAT(ins_time,"%Y-%m") = DATE_FORMAT(now(),"%Y-%m")
+    </select>
+</mapper>

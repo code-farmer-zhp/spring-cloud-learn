@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+    <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"   
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.feiniu.score.mapper.score.ReturnGroupMapper">
+
+	<select id="getReturnGroupByRgSeq" resultMap="returnGroup">
+		SELECT rg.rg_seq, rg.rg_no
+		 FROM  ${schema}return_group rg
+		WHERE rg.rg_seq =#{rgSeq}    
+	</select>
+	
+	<resultMap type="com.feiniu.score.entity.score.ReturnGroup" id="returnGroup">
+		<id property="rpSeq" column="rg_seq"/>
+		<result property="rgNo" column="rg_no"/>
+	</resultMap>
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+<table name="score_member127">
+	<column>sm_seq</column>
+	<column>mem_guid</column>
+	<column>total_score</column>
+	<column>available_score</column>
+	<column>used_score</column>
+	<column>expired_score</column>
+	<column>locked_score</column>
+	<row>
+		<value>1</value>
+		<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+		<value>40</value>
+		<value>40</value>
+		<value>0</value>
+		<value>0</value>
+		<value>0</value>
+	</row>
+</table>
+<table name="score_year127">
+	<column>scy_seq</column>
+	<column>mem_guid</column>
+	<column>total_score</column>
+	<column>available_score</column>
+	<column>used_score</column>
+	<column>expired_score</column>
+	<column>locked_score</column>
+	<column>due_time</column>
+ 
+	<row>
+		<value>1</value>
+		<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+		<value>10</value>
+		<value>10</value>
+		<value>0</value>
+		<value>0</value>
+		<value>0</value>
+		<value>2016-12-31</value>
+	</row>
+	<row>
+		<value>2</value>
+		<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+		<value>30</value>
+		<value>30</value>
+		<value>0</value>
+		<value>0</value>
+		<value>0</value>
+		<value>2015-12-31</value>
+	</row>
+</table>
+</dataset>

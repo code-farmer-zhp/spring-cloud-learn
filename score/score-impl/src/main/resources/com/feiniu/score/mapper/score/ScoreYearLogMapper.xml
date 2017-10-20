@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+    <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"   
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.feiniu.score.mapper.score.ScoreYearLogMapper">
+	
+	<insert id="saveScoreYearLog">
+	
+		INSERT INTO score_year_log${tableNo} (sml_seq, scy_seq, mem_guid, score_get, score_consume)
+											VALUES	
+											(#{syl.smlSeq}, #{syl.scySeq}, #{syl.memGuid}, #{syl.scoreGet}, #{syl.scoreConsume})
+	</insert>
+	
+ 
+	
+	<select id="getScoreYearLogByLM" resultMap="scoreYearLog">
+		SELECT syl_seq,sml_seq,scy_seq,mem_guid,score_get,score_consume from score_year_log${tableNo}
+			WHERE sml_seq=#{smlSeq}  AND mem_guid=#{memGuid} order by scy_seq
+	</select>
+	
+	<select id="getScoreYearLogBySmlSeqs" resultType="map">
+		SELECT scy_seq as 'scySeq', SUM(score_get) - SUM(score_consume) as 'score' from score_year_log${tableNo}
+			WHERE sml_seq in(${smlSeqs})  AND mem_guid=#{memGuid} GROUP BY scy_seq HAVING(SUM(score_get) - SUM(score_consume)) > 0 order by scy_seq
+	</select>
+	
+	<delete id="deleteScoreYearLogBySmlSeq">
+		DELETE from score_year_log${tableNo}
+		WHERE sml_seq = #{smlSeq} AND mem_guid=#{memGuid}
+	
+	</delete>
+	
+	<resultMap type="com.feiniu.score.entity.score.ScoreYearLog" id="scoreYearLog">
+		<id column="syl_seq" property="sylSeq"/>
+		<result column="sml_seq" property="smlSeq"/>
+		<result column="scy_seq" property="scySeq"/>
+		<result column="mem_guid" property="memGuid"/>
+		<result column="score_get" property="scoreGet"/>
+		<result column="score_consume" property="scoreConsume"/>
+	</resultMap>
+	
+</mapper>

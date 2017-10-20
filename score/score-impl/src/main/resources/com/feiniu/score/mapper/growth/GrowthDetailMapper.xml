@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.feiniu.score.mapper.growth.GrowthDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.feiniu.score.entity.growth.GrowthDetail" >
+    <id column="gd_seq" property="gdSeq" jdbcType="BIGINT" />
+    <result column="mem_guid" property="memGuid" jdbcType="VARCHAR" />
+    <result column="order_info_id" property="orderInfoId" jdbcType="BIGINT" />
+    <result column="operate" property="operate" jdbcType="VARCHAR" />
+    <result column="growth_value" property="growthValue" jdbcType="INTEGER" />
+    <result column="growth_channel" property="growthChannel" jdbcType="TINYINT" />
+    <result column="login_from" property="loginFrom" jdbcType="TINYINT" />
+    <result column="data_flag" property="dataFlag" jdbcType="TINYINT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="ins_man" property="insMan" jdbcType="VARCHAR" />
+    <result column="ins_date" property="insDate" jdbcType="TIMESTAMP" />
+    <result column="upd_man" property="updMan" jdbcType="VARCHAR" />
+    <result column="upd_date" property="updDate" jdbcType="TIMESTAMP" />
+     <result column="rg_seq" property="rgSeq" jdbcType="VARCHAR" />
+    <result column="rl_seq" property="rlSeq" jdbcType="VARCHAR" />
+    <result column="return_qty" property="returnQty" jdbcType="INTEGER" />
+    <result column="return_pay" property="returnPay" jdbcType="DECIMAL" />
+    
+  </resultMap>
+  
+  <resultMap id="GrowthOrderDetailResultMap" type="com.feiniu.score.vo.GrowthOrderDetail" >
+    <id column="gd_seq" property="gdSeq" jdbcType="BIGINT" />
+    <result column="mem_guid" property="memGuid" jdbcType="VARCHAR" />
+    <result column="order_info_id" property="orderInfoId" jdbcType="BIGINT" />
+    <result column="operate" property="operate" jdbcType="VARCHAR" />
+    <result column="growth_value" property="growthValue" jdbcType="INTEGER" />
+    <result column="growth_channel" property="growthChannel" jdbcType="TINYINT" />
+    <result column="login_from" property="loginFrom" jdbcType="TINYINT" />
+    <result column="data_flag" property="dataFlag" jdbcType="TINYINT" />
+    <result column="detail_remark" property="detailRemark" jdbcType="VARCHAR" />
+    <result column="detail_ins_date" property="detailInsDate" jdbcType="TIMESTAMP" />
+   	<result column="goi_seq" property="goiSeq" jdbcType="BIGINT" />
+    <result column="og_no" property="ogNo" jdbcType="VARCHAR" />
+    <result column="og_seq" property="ogSeq" jdbcType="VARCHAR" />
+    <result column="ogs_seq" property="ogsSeq" jdbcType="VARCHAR" />
+    <result column="adr_id" property="adrId" jdbcType="VARCHAR" />
+    <result column="ol_seq" property="olSeq" jdbcType="VARCHAR" />
+    <result column="it_no" property="itNo" jdbcType="VARCHAR" />
+    <result column="sm_seq" property="smSeq" jdbcType="VARCHAR" />
+    <result column="package_no" property="packageNo" jdbcType="VARCHAR" />
+    <result column="og_qty" property="ogQty" jdbcType="INTEGER" />
+	<result column="return_qty" property="returnQty" jdbcType="INTEGER" />
+    <result column="real_pay" property="realPay" jdbcType="DECIMAL" />
+    <result column="rg_seq" property="rgSeq" jdbcType="VARCHAR" />
+    <result column="rl_seq" property="rlSeq" jdbcType="VARCHAR" />
+    <result column="comment_seq" property="commentSeq" jdbcType="VARCHAR" />
+    <result column="pay_status" property="payStatus" jdbcType="TINYINT" />
+    <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
+    <result column="detail_upd_date" property="detailUpdDate" jdbcType="TIMESTAMP" />
+  </resultMap> 
+  
+  <sql id="Base_Column_List" >
+    gd_seq, mem_guid, order_info_id, operate, growth_value, growth_channel, login_from, rg_seq , rl_seq , return_qty , return_pay ,
+    data_flag, remark, ins_man, ins_date, upd_man, upd_date
+  </sql>
+  <select id="getGrowthDetailById" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from growth_detail${tableNo}
+    where gd_seq = #{gdSeq,jdbcType=BIGINT}
+  </select>
+
+   <select id="findDetailByOrder" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from growth_detail${tableNo}
+    where order_info_id = #{orderInfoId,jdbcType=BIGINT}
+    
+      <if test="growthChannels != null ">
+	      and growth_channel in
+	       		<foreach collection="growthChannels" index="" open="("  close=")" item="c" separator="," >
+		        	#{c}
+		        </foreach> 
+	  </if>
+  </select>
+  
+  
+   <select id="getGrowthDetailListByMemGuid" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from growth_detail${tableNo}
+    where mem_guid = #{memGuid}
+    <if test="paramMap.uniqueKey!= null"> 
+     and unique_key = #{paramMap.uniqueKey} 
+    </if>
+    <![CDATA[and growth_value !=0]]>
+    <if test="paramMap.start!= null and paramMap.pageSize!=null"> 
+     limit #{paramMap.start},#{paramMap.pageSize}
+    </if>
+  </select>
+  
+  <select id="getGrowthDetailCountByMemGuid" resultType="Integer">
+    select 
+    count(1)
+    from growth_detail${tableNo}
+    where mem_guid = #{memGuid}
+    <![CDATA[and growth_value !=0]]>
+  </select>
+  
+  <sql id="commonSelectSql">
+		from growth_detail${tableNo}  where mem_guid=#{paramMap.memGuid}
+		<if test="paramMap.orderInfoId != null">
+			and order_info_id=#{paramMap.orderInfoId}    
+		</if>
+		<if test="paramMap.operate != null">
+			and operate=#{paramMap.operate}    
+		</if>
+		 
+		<if test="paramMap.growthChannel != null">
+			and growth_channel =#{paramMap.growthChannel}    
+		</if>
+		
+		<if test="paramMap.displayChannels != null ">
+	      and gd.growth_channel not in
+	       		<foreach collection="paramMap.displayChannels" index="" open="("  close=")" item="c" separator="," >
+		        	#{c}
+		        </foreach> 
+	  	</if>
+		<if test="paramMap.loginFrom != null">
+			and login_from =#{paramMap.loginFrom}    
+		</if>
+		
+		<if test="paramMap.dataFlag != null">
+			and data_flag =#{paramMap.dataFlag}    
+		</if>
+		<if test="paramMap.loginDate!= null">
+			and DATE_FORMAT(ins_date,"%Y-%m-%d") = DATE_FORMAT(#{paramMap.loginDate},"%Y-%m-%d")
+		</if>
+	  	<if test="paramMap.uniqueKey!= null">
+		  and unique_key = #{paramMap.uniqueKey}
+	  	</if>
+	  	<if test="paramMap.showZero!= 1">
+			<![CDATA[and growth_value !=0]]>
+		</if>
+		<if test="paramMap.startDate!= null and paramMap.endDate!=null">
+			<![CDATA[ 
+			and Date(upd_date) <=Date(#{paramMap.endDate})  
+			and Date(upd_date) >=Date(#{paramMap.startDate})
+			 ]]>
+		</if>
+	</sql>
+	
+	<select id="getGrowthDetailListBySelective" resultMap="BaseResultMap">
+	select 
+	 	<include refid="Base_Column_List" />
+	  	<include refid="commonSelectSql" />
+		<if test="paramMap.withOrder!= 0">
+		order by upd_date DESC
+		</if>
+	  	<if test="paramMap.start!= null and paramMap.pageSize!=null"> 
+		limit #{paramMap.start},#{paramMap.pageSize}
+		</if>
+   </select>
+   
+   <select id="getGrowthDetailCountBySelective" resultType="Integer">
+	select 
+	 	count(1)
+	  	<include refid="commonSelectSql" />
+   </select>
+   
+   <!-- 
+   <select id="getGrowthOrderDetailBySelective" resultMap="GrowthOrderDetailResultMap">
+	select 
+	 	gd.gd_seq "gd_seq", gd.mem_guid "mem_guid", gd.order_info_id "order_info_id",
+	 	gd.operate "operate", gd.growth_value "growth_value", 
+	 	gd.growth_channel "growth_channel", 
+	 	gd.login_from "login_from", gd.data_flag "data_flag", 
+	 	gd.remark "detail_remark", gd.ins_date "detail_ins_date",
+	 	gd.upd_date "detail_upd_date",
+    	oi.goi_seq "goi_seq", oi.mem_guid "mem_guid", oi.og_no "og_no",
+    	oi.og_seq "og_seq",oi.adr_id "adr_id", oi.ol_seq "ol_seq", oi.it_no "it_no", 
+    	oi.package_no "package_no",oi.og_qty "og_qty",oi.return_qty "return_qty",
+    	oi.real_pay "real_pay", oi.rg_seq "rg_seq",
+    	oi.rl_seq "rl_seq", oi.comment_seq "comment_seq",
+    	oi.pay_status "pay_status",oi.pay_date "pay_date"
+	  	from growth_detail${tableNo} gd,growth_order_info${tableNo} oi
+	    where gd.mem_guid=#{paramMap.memGuid} 
+	    	and gd.mem_guid=oi.mem_guid
+	    	and gd.order_info_id=oi.goi_seq
+	    <if test="paramMap.gdSeq != null">
+			and gd.gd_seq=#{paramMap.gdSeq} 
+		</if>
+	    <if test="paramMap.orderInfoId != null">
+			and gd.order_info_id=#{paramMap.orderInfoId} 
+		</if>
+		<if test="paramMap.operate != null">
+			and gd.operate=#{paramMap.operate}    
+		</if>
+		 
+		<if test="paramMap.growthChannel != null">
+			and gd.growth_channel =#{paramMap.growthChannel}    
+		</if>
+		<if test="paramMap.loginFrom != null">
+			and gd.login_from =#{paramMap.loginFrom}    
+		</if>
+		
+		<if test="paramMap.dataFlag != null">
+			and gd.data_flag =#{paramMap.dataFlag}    
+		</if>
+		<if test="paramMap.startDate!= null and paramMap.endDate!=null">
+			<![CDATA[ 
+			and Date(gd.ins_date) <=Date(#{paramMap.endDate})  
+			and Date(gd.ins_date) >=Date(#{paramMap.startDate})
+			 ]]>
+		</if>
+		<if test="paramMap.ogNo!= null">
+			and oi.og_no =#{paramMap.ogNo}   
+		</if>
+		<if test="paramMap.ogSeq!= null">
+			and oi.og_seq =#{paramMap.ogSeq}   
+		</if>
+		<if test="paramMap.adrId!= null">
+			and oi.adr_id =#{paramMap.adrId}   
+		</if>
+		<if test="paramMap.olSeq!= null">
+			and oi.ol_seq =#{paramMap.olSeq}   
+		</if>
+		<if test="paramMap.itNo!= null">
+			and oi.it_no =#{paramMap.itNo}   
+		</if>
+		<if test="paramMap.packageNo!= null">
+			and oi.package_no =#{paramMap.packageNo}   
+		</if>
+		<if test="paramMap.rgSeq!= null">
+			and oi.rg_seq =#{paramMap.rgSeq}   
+		</if>
+		<if test="paramMap.rlSeq!= null">
+			and oi.rl_seq =#{paramMap.rlSeq}   
+		</if>
+		<if test="paramMap.commentSeq!= null">
+			and oi.comment_seq =#{paramMap.commentSeq}   
+		</if>
+		<if test="paramMap.payStatus!= null">
+			and oi.pay_status =#{paramMap.payStatus}   
+		</if>
+		<![CDATA[and gd.growth_value !=0]]>
+		order by detail_upd_date DESC
+		<if test="paramMap.start!= null and paramMap.pageSize!=null"> 
+		limit #{paramMap.start},#{paramMap.pageSize}
+		</if>
+   </select>
+    -->
+   <select id="getGrowthOrderDetailBySelective" resultMap="GrowthOrderDetailResultMap">
+	SELECT 
+	 	gd.gd_seq "gd_seq", gd.mem_guid "mem_guid", gd.order_info_id "order_info_id",
+	 	gd.operate "operate", gd.growth_value "growth_value", 
+	 	gd.growth_channel "growth_channel", 
+	 	gd.login_from "login_from", gd.data_flag "data_flag", 
+	 	gd.remark "detail_remark", gd.ins_date "detail_ins_date",
+	 	gd.upd_date "detail_upd_date",
+    	oi.goi_seq "goi_seq", oi.mem_guid "mem_guid", oi.og_no "og_no",
+    	oi.og_seq "og_seq",oi.ogs_seq "ogs_seq",oi.adr_id "adr_id", oi.ol_seq "ol_seq",
+    	oi.it_no "it_no", oi.sm_seq "sm_seq", 
+    	oi.package_no "package_no",oi.og_qty "og_qty",oi.return_qty "return_qty",
+    	oi.real_pay "real_pay", oi.rg_seq "rg_seq",
+    	oi.rl_seq "rl_seq", oi.comment_seq "comment_seq",
+    	oi.pay_status "pay_status",oi.pay_date "pay_date"
+	  	FROM growth_detail${tableNo} gd LEFT JOIN growth_order_info${tableNo} oi
+	  	ON gd.order_info_id=oi.goi_seq
+	    WHERE gd.mem_guid=#{paramMap.memGuid} 
+	    <if test="paramMap.gdSeq != null">
+			and gd.gd_seq=#{paramMap.gdSeq} 
+		</if>
+	    <if test="paramMap.orderInfoId != null">
+			and gd.order_info_id=#{paramMap.orderInfoId} 
+		</if>
+		<if test="paramMap.operate != null">
+			and gd.operate=#{paramMap.operate}    
+		</if>
+		 
+		<if test="paramMap.growthChannel != null">
+			and gd.growth_channel =#{paramMap.growthChannel}    
+		</if>
+		
+		<if test="paramMap.inChannels != null ">
+	      and gd.growth_channel  in
+	       		<foreach collection="paramMap.inChannels" index="" open="("  close=")" item="c" separator="," >
+		        	#{c}
+		        </foreach> 
+	  	</if>
+	  	
+		<if test="paramMap.displayChannels != null ">
+	      and gd.growth_channel not in
+	       		<foreach collection="paramMap.displayChannels" index="" open="("  close=")" item="c" separator="," >
+		        	#{c}
+		        </foreach> 
+	  	</if>
+	  
+		<if test="paramMap.loginFrom != null">
+			and gd.login_from =#{paramMap.loginFrom}    
+		</if>
+		
+		<if test="paramMap.dataFlag != null">
+			and gd.data_flag =#{paramMap.dataFlag}    
+		</if>
+		<if test="paramMap.startDate!= null and paramMap.endDate!=null">
+			<![CDATA[ 
+			and Date(gd.upd_date) <=Date(#{paramMap.endDate})  
+			and Date(gd.upd_date) >=Date(#{paramMap.startDate})
+			 ]]>
+		</if>
+		<if test="paramMap.ogNo!= null">
+			and oi.og_no =#{paramMap.ogNo}   
+		</if>
+		<if test="paramMap.ogSeq!= null">
+			and oi.og_seq =#{paramMap.ogSeq}   
+		</if>
+		<if test="paramMap.ogsSeq!= null">
+			and oi.ogs_seq =#{paramMap.ogsSeq}   
+		</if>
+		<if test="paramMap.adrId!= null">
+			and oi.adr_id =#{paramMap.adrId}   
+		</if>
+		<if test="paramMap.olSeq!= null">
+			and oi.ol_seq =#{paramMap.olSeq}   
+		</if>
+		<if test="paramMap.itNo!= null">
+			and oi.it_no =#{paramMap.itNo}   
+		</if>
+		<if test="paramMap.smSeq!= null">
+			and oi.sm_seq =#{paramMap.smSeq}   
+		</if>
+		<if test="paramMap.packageNo!= null">
+			and oi.package_no =#{paramMap.packageNo}   
+		</if>
+		<if test="paramMap.rgSeq!= null">
+			and oi.rg_seq =#{paramMap.rgSeq}   
+		</if>
+		<if test="paramMap.rlSeq!= null">
+			and oi.rl_seq =#{paramMap.rlSeq}   
+		</if>
+		<if test="paramMap.commentSeq!= null">
+			and oi.comment_seq =#{paramMap.commentSeq}   
+		</if>
+		<if test="paramMap.payStatus!= null">
+			and oi.pay_status =#{paramMap.payStatus}   
+		</if>
+		<![CDATA[and gd.growth_value !=0]]>
+		ORDER BY detail_upd_date DESC,detail_ins_date DESC
+		<if test="paramMap.start!= null and paramMap.pageSize!=null"> 
+		LIMIT #{paramMap.start},#{paramMap.pageSize}
+		</if>
+   </select>
+   
+   
+   <select id="getGrowthOrderDetailCountBySelective" resultType="Integer">
+	select count(1)
+	  	FROM growth_detail${tableNo} gd LEFT JOIN growth_order_info${tableNo} oi
+	  	ON gd.order_info_id=oi.goi_seq
+	    WHERE gd.mem_guid=#{paramMap.memGuid} 
+	    <if test="paramMap.gdSeq != null">
+			and gd.gd_seq=#{paramMap.gdSeq} 
+		</if>
+	    <if test="paramMap.orderInfoId != null">
+			and gd.order_info_id=#{paramMap.orderInfoId} 
+		</if>
+		<if test="paramMap.operate != null">
+			and gd.operate=#{paramMap.operate}    
+		</if>
+		 
+		<if test="paramMap.growthChannel != null">
+			and gd.growth_channel =#{paramMap.growthChannel}    
+		</if>
+		
+		<if test="paramMap.displayChannels != null ">
+	      and gd.growth_channel not in
+	       		<foreach collection="paramMap.displayChannels" index="" open="("  close=")" item="c" separator="," >
+		        	#{c}
+		        </foreach> 
+	  	</if>
+	  	
+		<if test="paramMap.loginFrom != null">
+			and gd.login_from =#{paramMap.loginFrom}    
+		</if>
+		
+		<if test="paramMap.dataFlag != null">
+			and gd.data_flag =#{paramMap.dataFlag}    
+		</if>
+		<if test="paramMap.startDate!= null and paramMap.endDate!=null">
+			<![CDATA[ 
+			and Date(gd.upd_date) <=Date(#{paramMap.endDate})  
+			and Date(gd.upd_date) >=Date(#{paramMap.startDate})
+			 ]]>
+		</if>
+		<if test="paramMap.ogNo!= null">
+			and oi.og_no =#{paramMap.ogNo}   
+		</if>
+		<if test="paramMap.ogSeq!= null">
+			and oi.og_seq =#{paramMap.ogSeq}   
+		</if>
+		<if test="paramMap.ogsSeq!= null">
+			and oi.ogs_seq =#{paramMap.ogsSeq}   
+		</if>
+		<if test="paramMap.adrId!= null">
+			and oi.adr_id =#{paramMap.adrId}   
+		</if>
+		<if test="paramMap.olSeq!= null">
+			and oi.ol_seq =#{paramMap.olSeq}   
+		</if>
+		<if test="paramMap.itNo!= null">
+			and oi.it_no =#{paramMap.itNo}   
+		</if>
+		<if test="paramMap.smSeq!= null">
+			and oi.sm_seq =#{paramMap.smSeq}   
+		</if>
+		<if test="paramMap.packageNo!= null">
+			and oi.package_no =#{paramMap.packageNo}   
+		</if>
+		<if test="paramMap.rgSeq!= null">
+			and oi.rg_seq =#{paramMap.rgSeq}   
+		</if>
+		<if test="paramMap.rlSeq!= null">
+			and oi.rl_seq =#{paramMap.rlSeq}   
+		</if>
+		<if test="paramMap.commentSeq!= null">
+			and oi.comment_seq =#{paramMap.commentSeq}   
+		</if>
+		<if test="paramMap.payStatus!= null">
+			and oi.pay_status =#{paramMap.payStatus}   
+		</if>
+		<![CDATA[and gd.growth_value !=0]]>
+   </select>
+   
+  <delete id="deleteGrowthDetailById" parameterType="java.lang.Long" >
+    delete from growth_detail${tableNo}
+    where gd_seq = #{gdSeq,jdbcType=BIGINT}
+  </delete>
+  
+
+  <insert id="saveGrowthDetail" useGeneratedKeys="true" keyProperty="gd.gdSeq" parameterType="com.feiniu.score.entity.growth.GrowthDetail">
+    insert into growth_detail${tableNo}
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        mem_guid,
+      <if test="gd.orderInfoId != null" >
+        order_info_id,
+      </if>
+        operate,
+        growth_value,
+        growth_channel,
+       <if test="gd.loginFrom != null" >  
+        login_from,
+        </if>
+      <if test="gd.dataFlag != null" >  
+        data_flag,
+       </if>
+      <if test="gd.remark != null" >
+        remark,
+      </if>
+      <if test="gd.insMan != null" >
+        ins_man,
+      </if>
+      <if test="gd.insDate != null" >
+        ins_date,
+      </if>
+      <if test="gd.updMan != null" >
+        upd_man,
+      </if>
+      <if test="gd.updDate != null" >
+        upd_date,
+      </if>
+      <if test="gd.uniqueKey != null" >
+        unique_key,
+      </if>
+		<if test="gd.groupKey != null" >
+			group_key,
+		</if>
+       <if test="gd.rgSeq != null" >
+        rg_seq,
+      </if>
+      <if test="gd.rlSeq != null" >
+        rl_seq,
+      </if>
+      <if test="gd.returnQty != null" >
+        return_qty,
+      </if>
+      <if test="gd.returnPay != null" >
+        return_pay,
+      </if>
+      
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{gd.memGuid,jdbcType=VARCHAR},
+      <if test="gd.orderInfoId != null" >
+        #{gd.orderInfoId,jdbcType=BIGINT},
+      </if>
+        #{gd.operate,jdbcType=VARCHAR},
+        #{gd.growthValue,jdbcType=INTEGER},
+        #{gd.growthChannel},
+       <if test="gd.loginFrom != null" >  
+        #{gd.loginFrom},
+       </if>
+       <if test="gd.dataFlag != null" >  
+        #{gd.dataFlag},
+        </if>
+      <if test="gd.remark != null" >
+        #{gd.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.insMan != null" >
+        #{gd.insMan,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.insDate != null" >
+        #{gd.insDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gd.updMan != null" >
+        #{gd.updMan,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.updDate != null" >
+        #{gd.updDate,jdbcType=TIMESTAMP},
+      </if>
+       <if test="gd.uniqueKey != null" >
+        #{gd.uniqueKey,jdbcType=VARCHAR},
+      </if>
+		<if test="gd.groupKey != null" >
+			#{gd.groupKey,jdbcType=VARCHAR},
+		</if>
+       <if test="gd.rgSeq != null" >
+        #{gd.rgSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.rlSeq != null" >
+        #{gd.rlSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.returnQty != null" >
+         #{gd.returnQty,jdbcType=INTEGER},
+      </if>
+      <if test="gd.returnPay != null" >
+        #{gd.returnPay,jdbcType=DECIMAL}
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateGrowthDetail">
+    update growth_detail${tableNo}
+    <set >
+      <if test="gd.orderInfoId != null" >
+        order_info_id = #{gd.orderInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="gd.operate != null" >
+        operate = #{gd.operate,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.growthValue != null" >
+        growth_value = #{gd.growthValue,jdbcType=INTEGER},
+      </if>
+      <if test="gd.growthChannel != null" >
+        growth_channel = #{gd.growthChannel},
+      </if>
+      <if test="gd.loginFrom != null" >
+        login_from = #{gd.loginFrom},
+      </if>
+      <if test="gd.dataFlag != null" >
+        data_flag = #{gd.dataFlag},
+      </if>
+      <if test="gd.remark != null" >
+        remark = #{gd.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.insMan != null" >
+        ins_man = #{gd.insMan,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.insDate != null" >
+        ins_date = #{gd.insDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gd.updMan != null" >
+        upd_man = #{gd.updMan,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.updDate != null" >
+        upd_date = #{gd.updDate,jdbcType=TIMESTAMP},
+      </if>
+      
+       <if test="gd.rgSeq != null" >
+        rg_seq = #{gd.rgSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.rlSeq != null" >
+        rl_seq = #{gd.rlSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="gd.returnQty != null" >
+         return_qty = #{gd.returnQty,jdbcType=INTEGER},
+      </if>
+      <if test="gd.returnPay != null" >
+         return_pay = #{gd.returnPay,jdbcType=DECIMAL}
+      </if>
+      
+    </set>
+    where gd_seq = #{gd.gdSeq,jdbcType=BIGINT}
+  </update>
+
+  <select id="getSumValueByMemGuid" resultType="Integer">
+
+	  SELECT
+  SUM(
+    CASE
+      operate
+      WHEN '-'
+      THEN -growth_value
+      WHEN '+'
+      THEN growth_value
+    END
+  ) "value"
+FROM
+  growth_detail${tableNo}
+WHERE mem_guid = #{memGuid}
+	  and data_flag = 1
+  </select>
+   
+   <sql id="Union_Column_List" >
+    	gd.mem_guid "mem_guid",  gd.operate "operate",
+    	SUM(gd.growth_value) "growth_value", 
+    	gd.login_from "login_from",
+	 	gd.growth_channel "growth_channel", 
+	 	gd.data_flag "data_flag",
+	    floor(UNIX_TIMESTAMP(gd.ins_date)/10) "detail_ins_date_div_10",
+	    gd.ins_date "detail_ins_date",
+	 	gd.upd_date "detail_upd_date",
+    	gd.rg_seq "rg_seq"
+  </sql>
+  
+   <select id="getGrowthDetailGroupByOg" resultMap="GrowthOrderDetailGroupByOgResultMap">
+	SELECT  <include refid="Union_Column_List" />
+	    ,(select oi.og_seq from growth_order_info${tableNo} oi where oi.goi_seq = gd.order_info_id)  "og_seq"
+	   ,(select oi.og_no from growth_order_info${tableNo} oi where oi.goi_seq = gd.order_info_id)  "og_no"
+	   <!--,(select oi.it_no from growth_order_info${tableNo} oi where oi.goi_seq = gd.order_info_id)  "it_no"
+	   ,(select oi.sm_seq from growth_order_info${tableNo} oi where oi.goi_seq = gd.order_info_id)  "sm_seq"
+	   ,(select oi.comment_seq from growth_order_info${tableNo} oi where oi.goi_seq = gd.order_info_id)  "comment_seq"-->
+	  	FROM growth_detail${tableNo} gd
+	   where gd.mem_guid=#{paramMap.memGuid} and data_flag=1
+		<if test="paramMap.startDate!= null and paramMap.endDate!=null">
+			<![CDATA[ 
+			and Date(gd.upd_date) <=Date(#{paramMap.endDate})  
+			and Date(gd.upd_date) >=Date(#{paramMap.startDate})
+			 ]]>
+		</if>
+		<![CDATA[and gd.growth_value !=0]]>
+	    GROUP BY gd.rg_seq, og_seq,gd.growth_channel, detail_ins_date_div_10
+		ORDER BY detail_upd_date DESC,detail_ins_date_div_10 DESC
+
+		<if test="paramMap.start!= null and paramMap.pageSize!=null"> 
+		LIMIT #{paramMap.start},#{paramMap.pageSize}
+		</if>
+   </select>
+   
+   <select id="getGrowthDetailCountGroupByOg" resultType="Integer">
+	SELECT count(1) FROM
+	(SELECT  <include refid="Union_Column_List" />
+	   ,(select oi.og_seq from growth_order_info${tableNo} oi where oi.goi_seq = gd.order_info_id)  "og_seq"
+	   FROM growth_detail${tableNo} gd
+	   where gd.mem_guid=#{paramMap.memGuid} and data_flag=1
+	   <if test="paramMap.startDate!= null and paramMap.endDate!=null">
+		   <![CDATA[
+			and Date(gd.upd_date) <=Date(#{paramMap.endDate})
+			and Date(gd.upd_date) >=Date(#{paramMap.startDate})
+			 ]]>
+	   </if>
+	   <![CDATA[and gd.growth_value !=0]]>
+	   GROUP BY gd.rg_seq, og_seq,gd.growth_channel, detail_ins_date_div_10
+	) gdgo
+   </select>
+
+	<select id="getGrowthDetailGroupByOgWithKey" resultMap="GrowthOrderDetailGroupByOgResultMap">
+		SELECT  <include refid="Union_Column_List" />
+		,oi.og_seq "og_seq",oi.og_no  "og_no",oi.it_no "it_no",oi.sm_seq "sm_seq",oi.comment_seq "comment_seq"
+		FROM growth_detail${tableNo} gd LEFT JOIN growth_order_info${tableNo} oi
+		ON gd.order_info_id=oi.goi_seq
+		WHERE gd.mem_guid=#{paramMap.memGuid} and data_flag=1
+		<if test="paramMap.startDate!= null and paramMap.endDate!=null">
+			<![CDATA[
+			and Date(gd.upd_date) <=Date(#{paramMap.endDate})
+			and Date(gd.upd_date) >=Date(#{paramMap.startDate})
+			 ]]>
+		</if>
+		<![CDATA[and gd.growth_value !=0]]>
+		GROUP BY gd.group_key
+		ORDER BY detail_upd_date DESC,detail_ins_date DESC
+		<if test="paramMap.start!= null and paramMap.pageSize!=null">
+			LIMIT #{paramMap.start},#{paramMap.pageSize}
+		</if>
+	</select>
+
+	<select id="getGrowthDetailCountGroupByOgWithKey" resultType="Integer">
+		SELECT count(1) FROM
+		(
+			SELECT 1
+			FROM growth_detail${tableNo} gd LEFT JOIN growth_order_info${tableNo} oi
+			ON gd.order_info_id=oi.goi_seq
+			WHERE gd.mem_guid=#{paramMap.memGuid} and data_flag=1
+			<if test="paramMap.startDate!= null and paramMap.endDate!=null">
+				<![CDATA[
+				and Date(gd.upd_date) <=Date(#{paramMap.endDate})
+				and Date(gd.upd_date) >=Date(#{paramMap.startDate})
+			 	]]>
+			</if>
+			<![CDATA[and gd.growth_value !=0]]>
+		GROUP BY gd.group_key
+		) gdgo
+	</select>
+
+   <resultMap id="GrowthOrderDetailGroupByOgResultMap" type="com.feiniu.score.vo.GrowthOrderDetailByOg" >
+    <id column="gd_seq" property="gdSeq" jdbcType="BIGINT" />
+    <result column="mem_guid" property="memGuid" jdbcType="VARCHAR" />
+    <result column="operate" property="operate" jdbcType="VARCHAR" />
+    <result column="growth_value" property="growthValue" jdbcType="INTEGER" />
+    <result column="login_from" property="loginFrom" jdbcType="TINYINT" />
+    <result column="growth_channel" property="growthChannel" jdbcType="TINYINT" />
+    <result column="data_flag" property="dataFlag" jdbcType="TINYINT" />
+    <result column="og_no" property="ogNo" jdbcType="VARCHAR" />
+    <result column="og_seq" property="ogSeq" jdbcType="VARCHAR" />
+    <result column="ogs_seq" property="ogsSeq" jdbcType="VARCHAR" />
+    <result column="rg_seq" property="rgSeq" jdbcType="VARCHAR" />
+    <result column="detail_ins_date" property="detailInsDate" jdbcType="TIMESTAMP" />
+    <result column="detail_upd_date" property="detailUpdDate" jdbcType="TIMESTAMP" />
+	<result column="it_no" property="itNo" jdbcType="VARCHAR" />
+	<result column="sm_seq" property="smSeq" jdbcType="VARCHAR" />
+  </resultMap> 
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+    <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"   
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.feiniu.score.mapper.score.ScoreFinancialMapper">
+
+	<select id="getPreDayScoreFinancial" resultMap="scoreFinancial">
+		SELECT edate, extend, effected, failure, used, recycling, left_effected,
+				left_to_be_effective, ebnu, suit_website, create_id, update_id,
+				create_time, update_time
+		FROM
+		  score_financial_report t 
+		WHERE t.edate = 
+		  (SELECT 
+		    MAX(a.edate) 
+		  FROM
+		    score_financial_report a 
+		  WHERE a.edate &lt; #{edate})
+	</select>
+	
+	<insert id="saveScoreFinancial" useGeneratedKeys="true" keyProperty="sf.id">
+		INSERT INTO score_financial_report
+			(edate, reciperare, extend, effected, failure, used, recycling, left_effected,
+			left_to_be_effective, ebnu, suit_website, create_id, update_id,
+			create_time, update_time)
+		VALUES
+			(#{sf.edate}, #{sf.reciperare}, #{sf.extend}, #{sf.effected}, #{sf.failure}, #{sf.used}, #{sf.recycling}, #{sf.leftEffected},
+			 #{sf.leftToBeEffective}, #{sf.ebnu}, #{sf.suitWebsite}, #{sf.createId}, #{sf.createId},
+			 now(), now())		
+	</insert>
+	
+	<resultMap type="com.feiniu.score.entity.score.ScoreFinancial" id="scoreFinancial">
+		<id property="id" column="id"/>
+		<result property="edate" column="edate"/>
+		<result property="reciperare" column="reciperare"/>
+		<result property="extend" column="extend"/>
+		<result property="effected" column="effected" />
+		<result property="failure" column="failure" />
+		<result property="used" column="used"/>
+		<result property="recycling" column="recycling"/>
+		<result property="leftEffected" column="left_effected"/>
+		<result property="leftToBeEffective" column="left_to_be_effective"/>
+		<result property="ebnu" column="ebnu"/>
+		<result property="suitWebsite" column="suit_website"/>
+		<result property="createId" column="create_id"/>
+		<result property="updateId" column="update_id"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+	</resultMap>
+</mapper>

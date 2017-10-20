@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+	<!-- appender name="STDOUT" class="org.apache.log4j.ConsoleAppender"> <layout
+		class="org.apache.log4j.PatternLayout"> <param name="ConversionPattern" value="%-5p
+		%d{MM月dd号 HH:mm} %-36c %5L %m%n" /> </layout> </appender -->
+
+	<!-- 把DEBUG信息输出到控制台 -->
+	<appender name="DEBUGConsole" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="DEBUG" />
+		</filter>
+	</appender>
+	<!-- 把INFO信息输出到控制台 -->
+	<appender name="INFOConsole" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+
+	<!-- 把INFO信息输出到日志文件 -->
+
+	<appender name="INFO" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/startup/startup.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+	<root>
+		<priority value="INFO" />
+		<appender-ref ref="DEBUGConsole" />
+		<appender-ref ref="INFO" />
+	</root>
+
+
+	<!--start 确认收货 -->
+	<appender name="growthReceiveOrderHandler" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File"
+			   value="logs/growthReceiveOrderHandler/growthReceiveOrderHandler.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.handler.GrowthReceiveOrderHandler" additivity="false">
+		<level value="info" />
+		<appender-ref ref="growthReceiveOrderHandler" />
+		<appender-ref ref="DEBUGConsole" />
+	</category>
+
+	<!-- start 取消订单 -->
+	<appender name="cancelMallOrderHandler" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/cancelMallOrderHandler/cancelMallOrderHandler.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.handler.CancelMallOrderHandler" additivity="false">
+		<level value="info" />
+		<appender-ref ref="cancelMallOrderHandler" />
+		<appender-ref ref="DEBUGConsole" />
+	</category>
+	<!-- end 取消订单 -->
+
+	<!-- start 退货确认 -->
+	<appender name="returnOrderConfirm" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/returnOrderConfirmHandler/returnOrderConfirmHandler.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.handler.ReturnOrderConfirmHanderl" additivity="false">
+		<level value="info" />
+		<appender-ref ref="returnOrderConfirm" />
+		<appender-ref ref="DEBUGConsole" />
+	</category>
+	<!-- end 退货确认-->
+
+	<!-- start 提交订单、付款-->
+	<appender name="orderScoreHandler" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/orderScoreHandler/orderScoreHandler.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.handler.OrderScoreHandler" additivity="false">
+		<level value="info" />
+		<appender-ref ref="orderScoreHandler" />
+		<appender-ref ref="DEBUGConsole" />
+	</category>
+	<!-- end 提交订单、付款-->
+
+	<!-- start CRM成长值消息消费-->
+	<appender name="growthHandler" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/growthHandler/growthHandler.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.handler.GrowthHandler" additivity="false">
+		<level value="info" />
+		<appender-ref ref="growthHandler" />
+		<appender-ref ref="DEBUGConsole" />
+	</category>
+	<!-- start CRM成长值消息消费-->
+
+	<!-- start CRM等级消息消费-->
+	<appender name="gradeHandler" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/gradeHandler/gradeHandler.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.handler.GradeHandler" additivity="false">
+		<level value="info" />
+		<appender-ref ref="gradeHandler" />
+		<appender-ref ref="DEBUGConsole" />
+	</category>
+	<!-- start CRM等级消息消费-->
+
+
+	<!--start kafka 信息 -->
+	<appender name="kafka" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/kafka/kafka.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<logger name="kafka" additivity="false">
+		<level value="info" />
+		<appender-ref ref="kafka" />
+		<appender-ref ref="DEBUGConsole" />
+	</logger>
+
+	<logger name="org.apache.zookeeper" additivity="false">
+		<level value="info" />
+		<appender-ref ref="kafka" />
+		<appender-ref ref="DEBUGConsole" />
+	</logger>
+
+	<logger name="com.feiniu.kafka" additivity="false">
+		<level value="info" />
+		<appender-ref ref="kafka" />
+		<appender-ref ref="DEBUGConsole" />
+	</logger>
+	<!--end kafka 信息 -->
+
+
+	<!--start feiniu 信息 -->
+	<appender name="feiniu" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/feiniu/allDetail.log" />
+		<param name="DatePattern" value="'_'yyyy-MM-dd'.log'" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<logger name="com.feiniu.score" additivity="false">
+		<level value="info" />
+		<appender-ref ref="feiniu" />
+		<appender-ref ref="DEBUGConsole" />
+	</logger>
+	<!--end feiniu 信息 -->
+
+
+
+</log4j:configuration>

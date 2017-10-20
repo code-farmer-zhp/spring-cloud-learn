@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+    <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"   
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.feiniu.score.mapper.score.ScoreConsumeMapper">
+
+	<select id="getScoreConsumeList" resultMap="scoreConsume">
+		SELECT scc_seq, sci_seq, ol_seq, score_get, score_consume, bill, ins_time
+		FROM score_consume  
+		WHERE 1=1
+		<if test="mapParam.sciSeq != null">
+			and sci_seq =#{mapParam.sciSeq}    
+		</if>
+		ORDER BY ol_seq ASC
+	</select>
+	 
+	<resultMap type="com.feiniu.score.entity.score.ScoreConsume" id="scoreConsume">
+		<id property="sccSeq" column="scc_seq"/>
+		<result property="sciSeq" column="sci_seq"/>
+		<result property="olSeq" column="ol_seq"/>
+		<result property="scoreGet" column="score_get"/>
+		<result property="scoreConsume" column="score_consume" />
+		<result property="bill" column="bill" />
+		<result property="insTime" column="ins_time"/>
+<!-- 		<result property="createId" column="create_id"/> -->
+<!-- 		<result property="updateId" column="update_id"/> -->
+	</resultMap>
+</mapper>

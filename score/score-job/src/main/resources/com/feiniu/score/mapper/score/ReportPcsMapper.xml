@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+    <!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"   
+    "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.feiniu.score.mapper.score.ReportPcsMapper">
+
+	<select id="getReportPcsList" resultMap="reportPcs">
+		SELECT rp.rp_seq, rp.rg_seq, rp.rl_seq, rp.og_seq, rp.ol_seq, rp.itno, rp.discount_price - rp.use_fulldis_points as price, og.og_no
+		 FROM  ${schema}report_pcs rp
+		INNER JOIN ${schema}order_group og
+		 ON rp.og_seq = og.og_seq
+		WHERE 1=1
+		<if test="mapParam.rgSeq != null and mapParam.rgSeq != ''">
+			and rp.rg_seq =#{mapParam.rgSeq}    
+		</if>
+		
+		<if test="mapParam.ogSeq != null">
+			and rp.og_seq =#{mapParam.ogSeq}    
+		</if>
+		ORDER BY rp.ol_seq ASC
+	</select>
+	
+	<resultMap type="com.feiniu.score.entity.score.ReportPcs" id="reportPcs">
+		<id property="rpSeq" column="rp_seq"/>
+		<result property="rgSeq" column="rg_seq"/>
+		<result property="rlSeq" column="rl_seq"/>
+		<result property="ogSeq" column="og_seq" />
+		<result property="olSeq" column="ol_seq"/>
+		<result property="itNo" column="itno"/>
+		<result property="price" column="price"/>
+		<result property="ogNo" column="og_no"/>
+	</resultMap>
+</mapper>

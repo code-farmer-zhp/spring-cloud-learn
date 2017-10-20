@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.feiniu.score.mapper.growth.GrowthLogMapper" >
+  <resultMap id="BaseResultMap" type="com.feiniu.score.entity.growth.GrowthLog" >
+    <result column="gl_seq" property="glSeq" jdbcType="BIGINT" />
+    <result column="mem_guid" property="memGuid" jdbcType="VARCHAR" />
+    <result column="table_name" property="tableName" jdbcType="VARCHAR" />
+    <result column="rec_id" property="recId" jdbcType="BIGINT" />
+    <result column="operate" property="operate" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="ins_man" property="insMan" jdbcType="VARCHAR" />
+    <result column="ins_date" property="insDate" jdbcType="TIMESTAMP" />
+    <result column="upd_man" property="updMan" jdbcType="VARCHAR" />
+    <result column="upd_date" property="updDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    gl_seq, mem_guid, table_name, rec_id, operate, remark, ins_man, 
+    ins_date, upd_man, upd_date  
+  </sql>
+  <select id="getGrowthLogById" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from growth_log${tableNo}
+    where gl_seq = #{glSeq,jdbcType=BIGINT}
+  </select>
+  
+   <delete id="deleteGrowthLogById" parameterType="java.lang.Long" >
+    delete from growth_log${tableNo}
+    where gl_seq = #{glSeq,jdbcType=BIGINT}
+  </delete>
+  
+  <select id="getGrowthLogListByMemGuid" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from growth_log${tableNo}
+    where mem_guid = #{memGuid}
+    limit #{paramMap.start},#{paramMap.pageSize}
+  </select>
+  
+  <select id="getGrowthLogCountByMemGuid" resultType="Integer">
+    select 
+    count(1)
+    from growth_log${tableNo}
+    where mem_guid = #{memGuid}
+  </select>
+  
+  <sql id="commonSelectSql">
+		from growth_log${tableNo}  where mem_guid=#{paramMap.memGuid}
+		<if test="paramMap.tableName != null">
+			and table_name=#{paramMap.tableName}    
+		</if>
+		<if test="paramMap.recId!= null">
+			and rec_id=#{paramMap.recId}    
+		</if>
+		 <if test="paramMap.operate != null">
+			and operate=#{paramMap.operate}    
+		</if>
+	</sql>
+	<select id="getGrowthLogListBySelective" resultMap="BaseResultMap">
+	select 
+	 	<include refid="Base_Column_List" />
+	  	<include refid="commonSelectSql" />
+		limit #{paramMap.start},#{paramMap.pageSize}
+   </select>
+   
+   <select id="getGrowthLogCountBySelective" resultType="Integer">
+	select 
+	 	count(1)
+	  	<include refid="commonSelectSql" />
+   </select>
+   
+  <insert id="saveGrowthLog">
+    insert into growth_log${tableNo}
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        mem_guid,
+        table_name,
+        rec_id,
+        operate,
+      <if test="gl.remark != null" >
+        remark,
+      </if>
+      <if test="gl.insMan != null" >
+        ins_man,
+      </if>
+      <if test="gl.insDate != null" >
+        ins_date,
+      </if>
+      <if test="gl.updMan != null" >
+        upd_man,
+      </if>
+      <if test="gl.updDate != null" >
+        upd_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{gl.memGuid,jdbcType=VARCHAR},
+        #{gl.tableName,jdbcType=VARCHAR},
+        #{gl.recId,jdbcType=BIGINT},
+        #{gl.operate,jdbcType=VARCHAR},
+      <if test="gl.remark != null" >
+        #{gl.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="gl.insMan != null" >
+        #{gl.insMan,jdbcType=VARCHAR},
+      </if>
+      <if test="gl.insDate != null" >
+        #{gl.insDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gl.updMan != null" >
+        #{gl.updMan,jdbcType=VARCHAR},
+      </if>
+      <if test="gl.updDate != null" >
+        #{gl.updDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <update id="updateGrowthLog">
+    update growth_log${tableNo}
+    <set >
+      <if test="gl.tableName != null" >
+     	table_name = #{gl.tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="gl.recId != null" >
+     	rec_id = #{gl.recId,jdbcType=BIGINT},
+      </if>
+      <if test="gl.operate != null" >
+     	operate = #{gl.operate,jdbcType=VARCHAR},
+      </if>
+      <if test="gl.remark != null" >
+         remark = #{gl.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="gl.insMan != null" >
+        ins_man = #{gl.insMan,jdbcType=VARCHAR},
+      </if>
+      <if test="gl.insDate != null" >
+        ins_date = #{gl.insDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gl.updMan != null" >
+        upd_man = #{gl.updMan,jdbcType=VARCHAR},
+      </if>
+      <if test="gl.updDate != null" >
+        upd_date = #{gl.updDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where gl_seq = #{gl.glSeq,jdbcType=BIGINT}
+  </update>
+</mapper>

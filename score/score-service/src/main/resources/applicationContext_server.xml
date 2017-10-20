@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:property-placeholder location="file:/home/webdata/score/webroot/config/application.properties,classpath*:checksrv.properties" />
+	<import resource="classpath:applicationContext-score-impl.xml"/>
+	<bean id="producerClient" class="com.feiniu.kafka.client.ProducerClient" destroy-method="close">
+		<constructor-arg index="0" value="${zookeeper.connect}" />
+		<constructor-arg index="1">
+			<props>
+				<prop key="serializer.class">kafka.serializer.StringEncoder</prop>
+				<prop key="request.required.acks">${request.required.acks}</prop>
+				<prop key="producer.type">${producer.type}</prop>
+			</props>
+		</constructor-arg>
+	</bean>
+</beans>

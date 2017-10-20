@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+	<table name="score_order_detail127">
+		<column>sod_seq</column>
+		<column>sml_seq</column>
+		<column>mem_guid</column>
+		<column>rp_seq</column>
+		<column>ol_seq</column>
+		<column>og_seq</column>
+		<column>rg_seq</column>
+		<column>rl_seq</column>
+		<column>it_no</column>
+		<column>score_get</column>
+		<column>score_consume</column>
+		<column>bill</column>
+		<column>type</column>
+		<row>
+			<value>36</value>
+			<value>27</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>201310C0700000050</value>
+			<value>201310C1400000002</value>
+			<value>1</value>
+			<value>1</value>
+			<value></value>
+			<value>201501CG200000122</value>
+			<value>16</value>
+			<value>10</value>
+			<value>1.0000</value>
+			<value>0</value>
+		</row>
+		<row>
+			<value>37</value>
+			<value>27</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>201310C0700000050</value>
+			<value>201310C1400000002</value>
+			<value>1</value>
+			<value>1</value>
+			<value></value>
+			<value>201501CG200000122</value>
+			<value>16</value>
+			<value>10</value>
+			<value>1.0000</value>
+			<value>0</value>
+		</row>
+	</table>
+	<table name="score_year127">
+		<column>scy_seq</column>
+		<column>mem_guid</column>
+		<column>total_score</column>
+		<column>available_score</column>
+		<column>used_score</column>
+		<column>expired_score</column>
+		<column>locked_score</column>
+		<column>due_time</column>
+		<row>
+			<value>4</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>50</value>
+			<value>20</value>
+			<value>10</value>
+			<value>0</value>
+			<value>20</value>
+			<value>2015-12-31</value>
+		</row>
+		<row>
+			<value>5</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>50</value>
+			<value>20</value>
+			<value>10</value>
+			<value>0</value>
+			<value>20</value>
+			<value>2016-12-31</value>
+		</row>
+	</table>
+
+
+	<table name="score_member127">
+		<column>sm_seq</column>
+		<column>mem_guid</column>
+		<column>total_score</column>
+		<column>available_score</column>
+		<column>used_score</column>
+		<column>expired_score</column>
+		<column>locked_score</column>
+
+		<row>
+			<value>2</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>80</value>
+			<value>40</value>
+			<value>20</value>
+			<value>0</value>
+			<value>40</value>
+
+
+		</row>
+	</table>
+
+	<table name="score_year_log127">
+		<column>syl_seq</column>
+		<column>sml_seq</column>
+		<column>scy_seq</column>
+		<column>mem_guid</column>
+		<column>score_get</column>
+		<column>score_consume</column>
+
+		<row>
+			<value>32</value>
+			<value>27</value>
+			<value>4</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>20</value>
+			<value>0</value>
+		</row>
+
+	</table>
+
+
+
+	<table name="score_main_log127">
+		<column>sml_seq</column>
+		<column>mem_guid</column>
+		<column>score_number</column>
+
+		<column>status</column>
+		<column>og_seq</column>
+		<column>channel</column>
+		<column>rg_seq</column>
+		<column>remark</column>
+		
+		<column>ins_time</column>
+		<column>end_time</column>
+		<column>limit_time</column>
+
+		<row>
+			<value>27</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>20</value>
+
+			<value>1</value>
+			<value>1</value>
+			<value>0</value>
+			<value>1</value>
+			<value>订单购买</value>
+			<value>2015-12-31 00:00:00</value>
+			<value>2015-12-31</value>
+			<value>2015-4-5</value>
+
+		</row>
+		<row>
+			<value>28</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>30</value>
+
+			<value>0</value>
+			<value>1</value>
+			<value>7</value>
+			<value>1</value>
+			<value>订单取消</value>
+			<value>2015-12-31 00:00:00</value>
+			<value>2015-12-31</value>
+			<value>2015-12-31</value>
+
+		</row>
+		<row>
+			<value>29</value>
+			<value>00004A51-DA01-2C45-216B-309AEEAA6945</value>
+			<value>20</value>
+
+			<value>0</value>
+			<value>1</value>
+			<value>5</value>
+			<value>1</value>
+			<value>积分生效</value>
+			<value>2015-12-31 00:00:00</value>
+			<value>2015-12-31</value>
+			<value>2015-12-31</value>
+
+		</row>
+	</table>
+
+
+
+</dataset>

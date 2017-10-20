@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+	<appender name="DEBUGConsole" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c %5L  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="DEBUG" />
+		</filter>
+	</appender>
+
+	<!-- 把INFO信息输出到控制台 -->
+	<appender name="INFOConsole" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p  %d   %-36c %5L  %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<root>
+		<priority value="info" />
+		<appender-ref ref="DEBUGConsole" />
+	</root>
+
+	<!-- start 配置积分生效job日志输出 -->
+	<appender name="scoreAvailable" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/scoreAvailable/score_available_job.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %t %5p [%c:%L] - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.job.service.ScoreAvailableJobServiceImpl" additivity="false">
+		<level value="info" />
+		<appender-ref ref="scoreAvailable" />
+		<appender-ref ref="INFOConsole" />
+	</category>
+	<!-- end 配置积分生效job日志输出 -->
+
+	<!-- start 配置积分失效job日志输出 -->
+	<appender name="scoreExpired" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/scoreExpired/score_expired_job.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %t %5p [%c:%L] - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.job.service.ScoreExpiredJobServiceImpl" additivity="false">
+		<level value="info" />
+		<appender-ref ref="scoreExpired" />
+		<appender-ref ref="INFOConsole" />
+	</category>
+	<!-- end 配置积分失效job日志输出 -->
+
+	<!-- start 配置统计财务积分报表job日志输出 -->
+	<appender name="scoreFinancial" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/scoreFinancial/score_financial_job.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="MaxFileSize" value="60000KB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %t %5p [%c:%L] - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.job.service.ScoreFinancialJobServiceImpl" additivity="false">
+		<level value="info" />
+		<appender-ref ref="scoreFinancial" />
+		<appender-ref ref="INFOConsole" />
+	</category>
+	<!-- end 配置统计财务积分报表job日志输出 -->
+
+	<!-- start 配置处理core-cal没有成功日志输出 -->
+	<appender name="scoreCalUnsuccess" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/scoreCalUnsuccess/cal_unsuccess_job.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="MaxFileSize" value="60000KB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %t %5p [%c:%L] - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.job.service.ScoreCalUnsuccessJobServiceImpl" additivity="false">
+		<level value="info" />
+		<appender-ref ref="scoreCalUnsuccess" />
+		<appender-ref ref="INFOConsole" />
+	</category>
+	<!-- end 配置处理core-cal没有成功日志输出 -->
+
+	<!-- start 商城积分迁移 -->
+	<appender name="scoreMallDataSync" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/scoreMallDataSync/mall_data_sync_job.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %t %5p [%c:%L] - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.job.service.ScoreMallDataSyncServiceImpl" additivity="false">
+		<level value="info" />
+		<appender-ref ref="scoreMallDataSync" />
+		<appender-ref ref="INFOConsole" />
+	</category>
+	<!-- end 商城积分迁移 -->
+
+	<!-- start 自动第10天给支付的订单成长值 -->
+	<appender name="autoConfirmGrowthOrder" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/autoConfirmGrowthOrder/auto_confirm_growth_order_job.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %t %5p [%c:%L] - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score.service.GrowthOrderServiceImpl" additivity="false">
+		<level value="info" />
+		<appender-ref ref="autoConfirmGrowthOrder" />
+		<appender-ref ref="INFOConsole" />
+	</category>
+	<!-- end 自动第10天给支付的订单成长值 -->
+
+
+	<!-- start  日志输出 -->
+	<appender name="scoreUnlockJobForWxServiceImpl" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/scoreUnlockJobForWx/scoreUnlockJobForWx_job.log" />
+		<param name="Append" value="true" />
+		<param name="Encoding" value="UTF-8" />
+		<param name="MaxFileSize" value="60000KB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %t %5p [%c:%L] - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="INFO" />
+		</filter>
+	</appender>
+
+	<category name="com.feiniu.score" additivity="false">
+		<level value="info" />
+		<appender-ref ref="scoreUnlockJobForWxServiceImpl" />
+		<appender-ref ref="INFOConsole" />
+	</category>
+	<!-- end 日志输出 -->
+</log4j:configuration>

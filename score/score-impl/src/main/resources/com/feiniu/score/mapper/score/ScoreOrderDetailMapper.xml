@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.feiniu.score.mapper.score.ScoreOrderDetailMapper">
+
+    <insert id="saveScoreOrderDetail">
+        INSERT INTO score_order_detail${tableNo} (sml_seq, mem_guid, rp_seq, ol_seq,
+        og_seq,og_no, rg_seq, rl_seq,it_no, score_get, score_consume, bill,
+        type,scy_seq,source_mode,rg_no,source_type,seller_no,package_no,quantity,kind,money,ogs_seq,site_mode,buy_mode,promotion_grade,store_no,sku_seq)
+        VALUES
+        <foreach collection="sodList" item="item" separator=",">
+            (#{item.smlSeq}, #{item.memGuid},
+            <choose>
+                <when test="item.rpSeq == null">'',</when>
+                <otherwise>#{item.rpSeq},</otherwise>
+            </choose>
+
+            <choose>
+                <when test="item.olSeq == null">'',</when>
+                <otherwise>#{item.olSeq},</otherwise>
+            </choose>
+            #{item.ogSeq},
+
+            <choose>
+                <when test="item.ogNo == null">'',</when>
+                <otherwise>#{item.ogNo},</otherwise>
+            </choose>
+
+            #{item.rgSeq}, #{item.rlSeq}, #{item.itNo},
+
+            <choose>
+                <!-- 退货发放扣除  订单消费  订单取消发放扣除 -->
+                <when test="item.type == 1 or item.type == 2 or item.type == 5">
+                    0,
+                </when>
+                <otherwise>
+                    #{item.scoreGet},
+                </otherwise>
+            </choose>
+
+            <choose>
+                <!--购买   退货时消费退回 订单取消消费退回 -->
+                <when test="item.type == 0 or item.type == 3 or item.type == 4">
+                    0,
+                </when>
+                <otherwise>
+                    #{item.scoreConsume},
+                </otherwise>
+            </choose>
+            #{item.bill}, #{item.type},#{item.scySeq},#{item.sourceMode},
+            <choose>
+                <when test="item.rgNo == null">'',</when>
+                <otherwise>
+                    #{item.rgNo},
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="item.sourceType == null">1,</when>
+                <otherwise>
+                    #{item.sourceType},
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="item.sellerNo == null">
+                    '',
+                </when>
+                <otherwise>
+                    #{item.sellerNo},
+                </otherwise>
+            </choose>
+            #{item.packageNo},
+            <choose>
+                <when test="item.quantity == null">1,</when>
+                <otherwise>
+                    #{item.quantity},
+                </otherwise>
+            </choose>
+            #{item.kind},
+            #{item.money},
+            <choose>
+                <when test="item.ogsSeq == null">'',</when>
+                <otherwise>#{item.ogsSeq},</otherwise>
+            </choose>
+            <choose>
+                <when test="item.siteMode == null">'',</when>
+                <otherwise>#{item.siteMode},</otherwise>
+            </choose>
+            <choose>
+                <when test="item.buyMode == null">'',</when>
+                <otherwise>#{item.buyMode},</otherwise>
+            </choose>
+            <choose>
+                <when test="item.promotionGrade == null">''</when>
+                <otherwise>#{item.promotionGrade}</otherwise>
+            </choose>
+            ,
+            <choose>
+                <when test="item.storeNo == null">''</when>
+                <otherwise>#{item.storeNo}</otherwise>
+            </choose>
+            ,
+            #{item.itNo}
+            )
+        </foreach>
+    </insert>
+    <select id="getScoreOrderDetailList" resultMap="scoreOrderDetail">
+        SELECT *
+        FROM score_order_detail${tableNo}
+        WHERE mem_guid=#{memGuid} AND og_seq=#{ogSeq}
+        <if test="type != null">
+            AND type=#{type}
+        </if>
+        ORDER BY sod_seq ASC
+    </select>
+
+    <select id="getScoreOrderDetailListByParam" resultMap="scoreOrderDetail">
+        SELECT *
+        FROM score_order_detail${tableNo}
+        WHERE 1=1
+        <if test="mapParam.memGuid != null">
+            AND mem_guid=#{mapParam.memGuid}
+        </if>
+        <if test="mapParam.ogSeq != null">
+            AND og_seq=#{mapParam.ogSeq}
+        </if>
+        <if test="mapParam.type != null">
+            AND type=#{mapParam.type}
+        </if>
+        <if test="mapParam.sourceType != null">
+            AND source_type=#{mapParam.sourceType}
+        </if>
+        <if test="mapParam.typesOfConsumeAndExchange != null ">
+            and type in
+            <foreach collection="mapParam.typesOfConsumeAndExchange" index="" open="(" close=")" item="c" separator=",">
+                #{c}
+            </foreach>
+        </if>
+        ORDER BY sod_seq ASC
+    </select>
+
+    <select id="loadOlScoreByType" resultType="map">
+        <!-- 订单购买获得 -->
+        <if test="type == 1">
+            SELECT
+            ol_seq "olSeq",
+            og_seq "ogSeq",
+            '+' AS "type",
+            SUM(score_get) "scoreNumber"
+            FROM
+            score_order_detail${tableNo}
+            WHERE ol_seq IN
+            <foreach collection="lists" item="item" separator="," open="(" close=")">
+                #{item.olSeq}
+            </foreach>
+            AND `type`=0
+            AND scy_seq !=0
+            GROUP BY ol_seq
+        </if>
+        <!-- 订单购买消费 -->
+        <if test="type ==2 ">
+            SELECT
+            ol_seq "olSeq",
+            og_seq "ogSeq",
+            '-' AS "type",
+            SUM(score_consume) "scoreNumber"
+            FROM
+            score_order_detail${tableNo}
+            WHERE ol_seq IN
+            <foreach collection="lists" item="item" separator="," open="(" close=")">
+                #{item.olSeq}
+            </foreach>
+            AND `type`=2
+            AND scy_seq !=0
+            GROUP BY ol_seq
+        </if>
+
+        <!-- 退货购买回收 -->
+        <if test="type ==3 ">
+            SELECT
+            ol_seq "olSeq",
+            og_seq "ogSeq",
+            '-' AS "type",
+            SUM(score_consume) "scoreNumber"
+            FROM
+            score_order_detail${tableNo}
+            WHERE ol_seq IN
+            <foreach collection="lists" item="item" separator="," open="(" close=")">
+                #{item.olSeq}
+            </foreach>
+            AND `type`=1
+            AND scy_seq !=0
+            GROUP BY ol_seq
+
+        </if>
+        <!-- 退货消费退回 -->
+        <if test="type ==4 ">
+            SELECT
+            ol_seq "olSeq",
+            og_seq "ogSeq",
+            '+' AS "type",
+            SUM(score_get) "scoreNumber"
+            FROM
+            score_order_detail${tableNo}
+            WHERE ol_seq IN
+            <foreach collection="lists" item="item" separator="," open="(" close=")">
+                #{item.olSeq}
+            </foreach>
+            AND `type` in(3,4)
+            AND scy_seq !=0
+            GROUP BY ol_seq
+        </if>
+    </select>
+
+
+    <select id="loadOlSore" resultType="map">
+        <foreach collection="lists" item="item" separator="union">
+            <if test="item.type == null">
+                SELECT
+                ol_seq "olSeq",
+                og_seq "ogSeq",
+                CASE
+                WHEN `TYPE`=2 THEN '-'
+                WHEN `TYPE`=0 THEN '+'
+                END "type",
+                CASE
+                WHEN `type`=2 THEN SUM(score_consume)
+                WHEN `type`=0 THEN SUM(score_get)
+                END "scoreNumber"
+                FROM
+                score_order_detail${tableNo}
+                WHERE ol_seq = #{item.olSeq}
+                AND og_no = #{item.ogNo}
+                AND scy_seq !=0
+                AND `type` in(0,2)
+                GROUP BY ol_seq
+            </if>
+            <!-- 订单购买获得 -->
+            <if test="item.type == 1">
+                SELECT
+                ol_seq "olSeq",
+                og_seq "ogSeq",
+                '+' AS "type",
+                SUM(score_get) "scoreNumber"
+                FROM
+                score_order_detail${tableNo}
+                WHERE ol_seq = #{item.olSeq}
+                AND og_no = #{item.ogNo}
+                AND `type`=0
+                AND scy_seq !=0
+                GROUP BY ol_seq
+            </if>
+            <!-- 订单购买消费 -->
+            <if test="item.type ==2 ">
+                SELECT
+                ol_seq "olSeq",
+                og_seq "ogSeq",
+                '-' AS "type",
+                SUM(score_consume) "scoreNumber"
+                FROM
+                score_order_detail${tableNo}
+                WHERE ol_seq = #{item.olSeq}
+                AND og_no = #{item.ogNo}
+                AND `type`=2
+                AND scy_seq !=0
+                GROUP BY ol_seq
+
+            </if>
+            <!-- 退货购买回收 -->
+            <if test="item.type ==3 ">
+                SELECT
+                ol_seq "olSeq",
+                og_seq "ogSeq",
+                '-' AS "type",
+                SUM(score_consume) "scoreNumber"
+                FROM
+                score_order_detail${tableNo}
+                WHERE ol_seq = #{item.olSeq}
+                AND og_no = #{item.ogNo}
+                AND `type`=1
+                AND scy_seq !=0
+                GROUP BY ol_seq
+
+            </if>
+
+            <!-- 退货消费退回 -->
+            <if test="item.type ==4 ">
+                SELECT
+                ol_seq "olSeq",
+                og_seq "ogSeq",
+                '+' AS "type",
+                SUM(score_get) "scoreNumber"
+                FROM
+                score_order_detail${tableNo}
+                WHERE ol_seq = #{item.olSeq}
+                AND og_no = #{item.ogNo}
+                AND `type` in(3,4)
+                AND scy_seq !=0
+                GROUP BY ol_seq
+            </if>
+
+
+        </foreach>
+    </select>
+
+
+    <select id="getSourceMode" resultType="Integer">
+        SELECT source_mode
+        FROM score_order_detail${tableNo}
+        WHERE
+        mem_guid=#{memGuid}
+        AND og_seq=#{ogSeq}
+        AND ol_seq=#{olSeq}
+        AND `type`=0
+    </select>
+
+    <select id="getSiteMode" resultType="String">
+        SELECT site_mode
+        FROM score_order_detail${tableNo}
+        WHERE
+        mem_guid=#{memGuid}
+        AND og_seq=#{ogSeq}
+        AND ol_seq=#{olSeq}
+        AND `type`=0
+
+    </select>
+
+    <select id="getNotScoreMode" resultType="map">
+        SELECT source_mode,site_mode,buy_mode,promotion_grade
+        FROM score_order_detail${tableNo}
+        WHERE
+        mem_guid=#{memGuid}
+        AND og_seq=#{ogSeq}
+        AND ol_seq=#{olSeq}
+        AND `type`=0
+    </select>
+
+    <update id="updateOrderDetialRgNo">
+        UPDATE score_order_detail${tableNo}
+        SET rg_no=#{rgNo}
+        WHERE mem_guid=#{memGuid}
+        AND rg_seq=#{rgSeq}
+        AND sml_seq=#{smlSeq}
+
+    </update>
+
+    <update id="updateOrderDetailScySeqBySodSeqs">
+        UPDATE score_order_detail${tableNo}
+        SET scy_seq=#{scySeq}
+        WHERE mem_guid=#{memGuid}
+        AND sod_seq in
+        <foreach collection="sodSeqs" item="sodSeq" open="(" close=")" separator=",">
+            #{sodSeq}
+        </foreach>
+
+    </update>
+
+    <select id="getSodAboutMallCancel" resultType="Integer">
+        SELECT COUNT(1) FROM score_order_detail${tableNo}
+        WHERE mem_guid=#{memGuid} AND og_seq =#{ogSeq}
+        AND type=4 AND it_no IN
+        <foreach collection="sodList" open="(" close=")" item="item" separator=",">
+            #{item.itNo}
+        </foreach>
+
+    </select>
+
+    <select id="getItConsumeScore" resultType="Integer">
+        SELECT SUM(score_consume) FROM score_order_detail${tableNo}
+        WHERE mem_guid=#{memGuid} AND
+        ol_seq=#{returnDetail.olSeq} AND og_seq=#{ogSeq}
+        AND type=2
+
+    </select>
+
+    <select id="getItHaveReturnCount" resultType="Integer">
+        SELECT
+        SUM(quantity)
+        FROM
+        (SELECT
+        *
+        FROM
+        score_order_detail${tableNo}
+        WHERE og_seq=#{ogSeq}
+        AND ol_seq=#{returnDetail.olSeq}
+        AND TYPE = 3
+        GROUP BY rg_seq) a
+
+    </select>
+
+    <select id="getItHaveReturnScore" resultType="Integer">
+
+        SELECT
+        SUM(score_get)
+        FROM
+        score_order_detail${tableNo}
+        WHERE og_seq=#{ogSeq}
+        AND ol_seq=#{returnDetail.olSeq}
+        AND TYPE = 3
+
+    </select>
+
+    <select id="getItHaveRecycleScore" resultType="Integer">
+        SELECT
+        SUM(score_consume)
+        FROM
+        score_order_detail${tableNo}
+        WHERE og_seq=#{ogSeq}
+        AND ol_seq=#{returnDetail.olSeq}
+        AND TYPE = 1
+    </select>
+
+    <select id="getItHaveReturnMoney" resultType="BigDecimal">
+        SELECT
+        SUM(money)
+        FROM
+        score_order_detail${tableNo}
+        WHERE og_seq=#{ogSeq}
+        AND ol_seq=#{returnDetail.olSeq}
+        AND TYPE = 1
+
+    </select>
+
+
+    <select id="getScoreOrderDetailCountByRlSeqs" resultType="Integer">
+        SELECT COUNT(1) FROM score_order_detail${tableNo}
+        WHERE rl_seq in
+        <foreach collection="lists" item="item" open="(" close=")" separator=",">
+            #{item.rlSeq}
+        </foreach>
+
+    </select>
+
+
+    <delete id="deleteBySmlSeq">
+        DELETE FROM score_order_detail${tableNo}
+        WHERE mem_guid = #{memGuid} AND sml_seq=#{smlSeq}
+    </delete>
+
+    <select id="getScoreDetailByOlSeqs" resultMap="scoreOrderDetail">
+        SELECT
+        ol_seq,
+        SUM(score_get) "score_get",
+        SUM(score_consume) "score_consume",
+        TYPE "type"
+        FROM
+        score_order_detail${tableNo}
+        WHERE ol_seq IN
+        <foreach collection="olSeqs" open="(" close=")" separator="," item="olSeq">
+            #{olSeq}
+        </foreach>
+        AND TYPE IN (0, 2)
+        GROUP BY ol_seq, TYPE
+    </select>
+
+    <select id="getScoreOrderDetailBuyListByOgsSeq" resultMap="scoreOrderDetail">
+      SELECT
+        *
+      FROM
+        score_order_detail${tableNo}
+      WHERE ogs_seq=#{ogsSeq}
+      AND type=#{type}
+
+    </select>
+
+    <select id="getScoreByOgsSeq" resultType="map">
+        SELECT
+          SUM(score_get) "score",
+          ogs_seq "ogsSeq"
+        FROM
+           score_order_detail${tableNo}
+        WHERE ogs_seq = #{ogsSeq}
+          AND mem_guid = #{memGuid}
+          AND TYPE = 0
+
+    </select>
+
+    <select id="getScoreOrderDetailBySmlSeq" resultType="java.lang.Integer">
+        SELECT count(1) FROM  score_order_detail${tableNo}
+        WHERE mem_guid = #{memGuid} AND sml_seq = #{smlSeq} AND type=#{type}
+    </select>
+
+    <select id="getRecoveryScore" resultType="java.lang.Integer">
+        SELECT sum(score_consume) FROM score_order_detail${tableNo}
+        WHERE  rg_seq=#{rgSeq} AND it_no=#{skuSeq} AND type=1
+    </select>
+
+    <resultMap type="com.feiniu.score.entity.score.ScoreOrderDetail" id="scoreOrderDetail">
+        <id column="sod_seq" property="sodSeq"/>
+        <result column="sml_seq" property="smlSeq"/>
+        <result column="mem_guid" property="memGuid"/>
+        <result column="rp_seq" property="rpSeq"/>
+        <result column="ol_seq" property="olSeq"/>
+        <result column="og_seq" property="ogSeq"/>
+        <result column="og_no" property="ogNo"/>
+        <result column="rg_seq" property="rgSeq"/>
+        <result column="rl_seq" property="rlSeq"/>
+        <result column="it_no" property="itNo"/>
+        <result column="score_get" property="scoreGet"/>
+        <result column="score_consume" property="scoreConsume"/>
+        <result column="bill" property="bill"/>
+        <result column="type" property="type"/>
+        <result column="ins_time" property="insTime"/>
+        <result column="scy_seq" property="scySeq"/>
+        <result column="source_mode" property="sourceMode"/>
+        <result column="rg_no" property="rgNo"/>
+        <result column="source_type" property="sourceType"/>
+        <result column="seller_no" property="sellerNo"/>
+        <result column="package_no" property="packageNo"/>
+        <result column="quantity" property="quantity"/>
+        <result column="kind" property="kind"/>
+        <result column="money" property="money"/>
+        <result column="ogs_seq" property="ogsSeq"/>
+        <result column="site_mode" property="siteMode"/>
+        <result column="buy_mode" property="buyMode"/>
+        <result column="promotion_grade" property="promotionGrade"/>
+        <result column="store_no" property="storeNo"/>
+    </resultMap>
+</mapper>
