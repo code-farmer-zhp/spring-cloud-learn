@@ -1,8 +1,0 @@
-spring:
-  cloud:
-    consul:
-      host: localhost
-      port: 8500
-      discovery:
-        tags: foo=bar, baz
-        instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}

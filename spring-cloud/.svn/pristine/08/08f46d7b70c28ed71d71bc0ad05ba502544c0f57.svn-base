@@ -1,8 +1,0 @@
-spring.cloud.config.server.git.uri=https://github.com/code-farmer-zhp/spring-cloud-learn/
-spring.cloud.config.server.git.search-paths={application}
-spring.cloud.config.server.git.username=1009042136@qq.com
-spring.cloud.config.server.git.password=680332550z
-spring.application.name=config-server
-server.port=6790
-
-eureka.client.service-url.defaultZone=http://localhost:1111/eureka/,http://localhost:1112/eureka/

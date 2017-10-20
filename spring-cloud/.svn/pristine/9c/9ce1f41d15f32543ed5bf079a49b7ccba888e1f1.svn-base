@@ -1,7 +1,0 @@
-spring.rabbitmq.host=localhost
-spring.rabbitmq.port=5672
-spring.rabbitmq.username=guest
-spring.rabbitmq.password=guest
-server.port=1357
-spring.cloud.stream.bindings.input.group=group2
-spring.application.name=cloudstream

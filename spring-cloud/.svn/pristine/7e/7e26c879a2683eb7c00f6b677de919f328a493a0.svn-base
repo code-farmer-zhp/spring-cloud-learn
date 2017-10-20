@@ -1,8 +1,0 @@
-spring:
-  cloud:
-    stream:
-      bindings:
-        channel2:
-          destination: test2
-        channel1:
-          destination: test1
