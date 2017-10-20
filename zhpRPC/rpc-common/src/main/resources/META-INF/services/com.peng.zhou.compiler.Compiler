@@ -1,0 +1,3 @@
+adaptive=com.peng.zhou.compiler.support.AdaptiveCompiler
+jdk=com.peng.zhou.compiler.support.JdkCompiler
+javassist=com.peng.zhou.compiler.support.JavassistCompiler

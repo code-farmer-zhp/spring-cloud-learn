@@ -1,0 +1,3 @@
+springfox.api.group=zhpgroup
+springfox.api.status.500=
+springfox.api.status.501=

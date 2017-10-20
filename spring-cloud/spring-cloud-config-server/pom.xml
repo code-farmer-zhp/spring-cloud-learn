@@ -1,0 +1,308 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>spring-cloud-config-server</groupId>
+	<artifactId>spring-cloud-config-server</artifactId>
+	<packaging>war</packaging>
+	<version>1.0.0</version>
+	<name>mem-web Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<skip_maven_deploy>true</skip_maven_deploy>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java-version>1.7</java-version>
+		<start-class>com.feiniu.SpringBootController</start-class>
+		<spring.version>4.3.2.RELEASE</spring.version>
+		<package.name>mem-web</package.name>
+	</properties>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.1.RELEASE</version>
+	</parent>
+	<dependencies>
+
+		<dependency>
+			<groupId>org.tmatesoft.svnkit</groupId>
+			<artifactId>svnkit</artifactId>
+			<version>1.8.10</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+			<version>1.5.1.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<version>1.5.1.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+			<version>1.3.1.RELEASE</version>
+		</dependency>
+
+	</dependencies>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Dalston.SR1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-config</artifactId>
+				<version>1.3.1.RELEASE</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+
+	</dependencyManagement>
+
+
+	<build>
+		<finalName>mem-web</finalName>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<!--<exclude>application.properties</exclude>
+					<exclude>applicationContext.xml</exclude>
+					<exclude>log4j.xml</exclude>-->
+					<exclude>distribute/**</exclude>
+					<exclude>server/**</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+		<plugin> 
+			<groupId>org.apache.maven.plugins</groupId> 
+			<artifactId>maven-compiler-plugin</artifactId> 
+			<configuration> 
+			<source>1.7</source> 
+			<target>1.7</target> 
+			</configuration> 
+			</plugin> 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<webResources>
+						<!--<resource>
+							<directory>${webXmlPath}</directory>
+							<targetPath>WEB-INF</targetPath>
+							<includes>
+								<include>web.xml</include>
+							</includes>
+						</resource>-->
+						<!--<resource>
+							<directory>src/main/webapp</directory>
+							<includes>
+								<include>feiniufnapphealthcheckstatus.jsp</include>
+							</includes>
+							<filtering>true</filtering>
+						</resource>-->
+					</webResources>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.0</version>
+				<configuration>
+					<port>8080</port>
+					<path>/mem-web</path>
+					<uriEncoding>UTF-8</uriEncoding>
+					<finalName>mem-web</finalName>
+					<server>tomcat7</server>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<format>{0,date,yyyy-MM-dd HH:mm:ss}</format>
+					<items>
+						<item>timestamp</item>
+					</items>
+					<buildNumberPropertyName>current.time</buildNumberPropertyName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<build>
+				<plugins>
+					<!-- 开发环境配置文件[mvn clean package -Pdev] -->
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>compile</id>
+								<phase>compile</phase>
+								<configuration>
+									<tasks>
+										<echo
+											message="====================== copy dev property files ======================" />
+										<copy todir="${basedir}/target/classes/" overwrite="true">
+											<fileset dir="${basedir}/src/main/resources/distribute/dev/" />
+										</copy>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>beta</id>
+			<build>
+				<plugins>
+					<!-- Beta环境配置文件[mvn clean package -Pbeta] -->
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>compile</id>
+								<phase>compile</phase>
+								<configuration>
+									<tasks>
+										<echo
+											message="====================== copy beta property files ======================" />
+										<copy todir="${basedir}/target/classes/" overwrite="true">
+											<fileset dir="${basedir}/src/main/resources/distribute/beta/" />
+										</copy>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>preview</id>
+			<build>
+				<plugins>
+					<!-- 预发布环境配置文件[mvn clean package -Ppreview] -->
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>compile</id>
+								<phase>compile</phase>
+								<configuration>
+									<tasks>
+										<echo
+											message="====================== copy preview property files ======================" />
+										<copy todir="${basedir}/target/classes/" overwrite="true">
+											<fileset dir="${basedir}/src/main/resources/distribute/preview/" />
+										</copy>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>online</id>
+			<build>
+				<plugins>
+					<!-- 线上环境配置文件[mvn clean package -Ponline] -->
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>compile</id>
+								<phase>compile</phase>
+								<configuration>
+									<tasks>
+										<echo
+											message="====================== copy online property files ======================" />
+										<copy todir="${basedir}/target/classes/" overwrite="true">
+											<fileset dir="${basedir}/src/main/resources/distribute/online/" />
+										</copy>
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>		
+	
+	<scm>
+		<connection>scm:svn:http://wh-svn.fn.com/feiniu-website/code</connection>
+		<developerConnection>scm:svn:http://wh-svn.fn.com/feiniu-website/code</developerConnection>
+		<tag>HEAD</tag>
+		<url>http://wh-svn.fn.com/feiniu-website</url>
+	</scm> 
+</project>

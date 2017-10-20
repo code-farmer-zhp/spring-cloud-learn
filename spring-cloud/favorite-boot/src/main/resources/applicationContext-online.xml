@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:property-placeholder location="file:/home/webdata/favorite/webroot/config/application.properties,classpath*:checksrv.properties" />
+	
+	<import resource="classpath:bean-asyncload.xml"/>
+	
+    <aop:aspectj-autoproxy  proxy-target-class="true" />
+	
+	<context:component-scan base-package="com.feiniu.favorite" />
+	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass">
+			<value>${mysql.jdbc.driver}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${mysql.jdbc.url}</value>
+		</property>
+		<property name="user">
+			<value>${mysql.jdbc.user}</value>
+		</property>
+		<property name="password">
+			<value>${mysql.jdbc.password}</value>
+		</property>
+		<property name="initialPoolSize">
+			<value>${mysql.jdbc.initial-pool-size}</value>
+		</property>
+		<property name="minPoolSize">
+			<value>${mysql.jdbc.min-pool-size}</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>${mysql.jdbc.max-pool-size}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>${mysql.jdbc.max-idle-time}</value>
+		</property>
+		<property name="checkoutTimeout">
+			<value>${mysql.jdbc.checkout-timeout}</value>
+		</property>
+		<property name="acquireIncrement">
+			<value>${mysql.jdbc.acquire-increment}</value>
+		</property>
+		<property name="acquireRetryAttempts">
+			<value>${mysql.jdbc.acquire-retry-attempts}</value>
+		</property>
+		<property name="acquireRetryDelay">
+			<value>${mysql.jdbc.acquire-retry-delay}</value>
+		</property>
+		<property name="autoCommitOnClose">
+			<value>${mysql.jdbc.auto-commit-onclose}</value>
+		</property>
+		<property name="preferredTestQuery">
+			<value>${mysql.jdbc.preferred-test-query}</value>
+		</property>
+		<property name="breakAfterAcquireFailure">
+			<value>${mysql.jdbc.break-after-acquire-failure}</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>${mysql.jdbc.idle-connection-test-period}</value>
+		</property>
+		<property name="maxStatements">
+			<value>${mysql.jdbc.max-statements}</value>
+		</property>
+		<property name="maxStatementsPerConnection">
+			<value>${mysql.jdbc.max-statements-perconnection}</value>
+		</property>
+	</bean>
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:configMapper.xml" />
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.feiniu.favorite.mapper" />
+	</bean>
+	
+	<bean id="producerClient" class="com.feiniu.kafka.client.ProducerClient">
+		<constructor-arg index="0" value="${zookeeper.connect}" />
+		<constructor-arg index="1">
+			<props>
+				<prop key="serializer.class">kafka.serializer.StringEncoder</prop>
+				<prop key="request.required.acks">${request.required.acks}</prop>
+				<prop key="producer.type">${producer.type}</prop>
+			</props>
+		</constructor-arg>
+	</bean>
+	
+    
+	<!--连接池配置-->
+	<bean id="cachePool" class="com.fn.cache.client.pool.CachePool">
+		<property name="zkAddress" value="${redis.connect}"/>
+		<property name="appName" value="${redis.appName}"/>
+		<!--连接池属性配置  可选-->
+	<!--如果赋值为-1，则表示不限制；如果pool已经分配了maxConn个jedis实例，则此时pool的状态为exhausted(耗尽)-->
+		<property name="maxConn" value="8"/>
+		<!--控制一个pool最多有多少个状态为idle(空闲的)的jedis实例-->
+		<property name="minConn" value="8"/>
+		<!--连接socket超时默认2(秒),属性单位毫秒-->
+		<property name="maxWait" value="1000"/>
+		<!--设置单机模式连接池方式(0：旧模式，1：连接池模式)-->
+		<property name="standAloneModel" value="1"/>
+	</bean>
+    
+    <!--cache客户端实例-->
+	<bean id="redisCacheClient" class="com.fn.cache.client.RedisCacheClient" init-method="init">
+		<!--缓存连接池-->
+		<property name="cachePool" ref="cachePool"/>
+	</bean>  
+	
+	<bean id="requestFactory" class="org.springframework.http.client.SimpleClientHttpRequestFactory">
+		<property name="readTimeout" value="${requestFactory.readTimeout}"/>
+		<property name="connectTimeout" value="${requestFactory.connectTimeout}"/>
+	</bean>
+	
+		<!-- restful客户端 -->
+	 <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+		 <constructor-arg ref="requestFactory"/>
+        <property name="messageConverters"> 
+            <list> 
+                <bean id="stringHttpMessageConverter" 
+                    class="org.springframework.http.converter.StringHttpMessageConverter" >
+					<constructor-arg value="UTF-8"/>
+                </bean>
+                <bean id="formHttpMessageConverter" 
+                    class="org.springframework.http.converter.FormHttpMessageConverter" /> 
+            </list> 
+        </property>
+    </bean>
+</beans>

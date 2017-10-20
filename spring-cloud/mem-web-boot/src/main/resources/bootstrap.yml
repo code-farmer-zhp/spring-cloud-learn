@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    config:
+       name: mem-web
+       profile: dev
+       #uri: http://localhost:6789/
+       label: master
+       discovery:
+         service-id: config-server
+         enabled: true
+       fail-fast: true
+
+eureka:
+  client:
+    service-url:
+     defaultZone: http://localhost:1111/eureka/,http://localhost:1111/eureka/

@@ -1,0 +1,8 @@
+1.consul安装及启动
+windows系统放入C:\Windows\System32 目录下,contos 放入/usr/bin目录下 ，启动使用以下命令，注意目录的创建和本地ip地址配置正确。
+consul agent -server -bootstrap-expect 1 -advertise 192.168.141.130 -data-dir /tmp/newconsul/consul -config-dir /tmp/newconsul/consul-config -ui-dir ${BASEDIR}/consul_ui -client 192.168.141.130
+2.git2consul 安装及启动（目前只有linux版本已测试）
+安装
+npm install -g git2consul  （需要npm,git已安装）
+启动
+git2consul --endpoint remote.consul.host --port 80 --config-file /tmp/git2consul.json
